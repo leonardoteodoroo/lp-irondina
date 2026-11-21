@@ -17,7 +17,7 @@ import subprocess
 from pathlib import Path
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
+from PIL import Image, ImageDraw, ImageFilter, ImageEnhance, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 INSUMOS_DIR = ROOT / "_projeto" / "insumos-instagram"
@@ -318,32 +318,100 @@ def build_video_mvp() -> None:
     )
 
 
+def _load_font(candidates: list[str], size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    for path in candidates:
+        if os.path.exists(path):
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                continue
+    return ImageFont.load_default()
+
+
 def build_og_image(tag_map: dict[str, Path]) -> None:
-    """Gera imagem Open Graph 1200x630 editorial em public/og-image.webp e public/og-image.jpg."""
-    canvas = Image.new("RGB", (1200, 630), (250, 248, 245))  # #FAF8F5
+    """Gera imagem Open Graph 1200x630 Dark Luxe com retrato exclusivo da Irondina Mascarenhas (IRO-03)."""
+    base = Image.new("RGBA", (1200, 630), (21, 16, 14, 255))  # #15100E
+
+    # Retrato exclusivo da Irondina Mascarenhas (IRO-03 — pele morena iluminada + cachos)
+    with Image.open(tag_map["IRO-03"]) as src_img:
+        photo = face_aware_crop(src_img, 760, 630, mode="portrait").convert("RGBA")
+
+    # Degradê horizontal suave na borda esquerda da foto para fundir com o palco escuro
+    alpha_mask = Image.new("L", (760, 630), 255)
+    mask_px = alpha_mask.load()
+    fade_w = 240
+    for x in range(fade_w):
+        alpha_val = int(255 * ((x / fade_w) ** 1.35))
+        for y in range(630):
+            mask_px[x, y] = alpha_val
+
+    base.paste(photo, (440, 0), alpha_mask)
+
+    # Scrim adicional sutil em RGBA na metade esquerda para garantir alto contraste editorial
+    scrim = Image.new("RGBA", (1200, 630), (0, 0, 0, 0))
+    scrim_px = scrim.load()
+    for x in range(660):
+        t = 1.0 - (x / 660.0)
+        a = int(245 * (t ** 1.25))
+        for y in range(630):
+            scrim_px[x, y] = (21, 16, 14, a)
+
+    canvas = Image.alpha_composite(base, scrim).convert("RGB")
     draw = ImageDraw.Draw(canvas)
 
-    # Faixa lateral esquerda editorial #F3F0EB
-    draw.rectangle([0, 0, 520, 630], fill=(243, 240, 235))
-    # Linha divisória Blush/Areia
-    draw.rectangle([518, 0, 522, 630], fill=(223, 161, 148))
+    serif_regular = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Roman.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        60,
+    )
+    serif_brand = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Roman.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        46,
+    )
+    serif_italic = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Italic.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-italic.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        28,
+    )
+    sans_meta = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        ],
+        18,
+    )
 
-    # Duas fotos reais à direita: IG-06 (pele clean) e IRO-04 (Irondina)
-    with Image.open(tag_map["IG-06"]) as img1:
-        p1 = face_aware_crop(img1, 340, 630, mode="portrait")
-        canvas.paste(p1, (522, 0))
+    blush = (223, 161, 148)     # #DFA194
+    alabaster = (250, 248, 245) # #FAF8F5
+    sand = (212, 197, 183)      # #D4C5B7
 
-    with Image.open(tag_map["IRO-04"]) as img2:
-        p2 = face_aware_crop(img2, 338, 630, mode="portrait")
-        canvas.paste(p2, (862, 0))
+    # Bloco Tipográfico Editorial na Coluna Esquerda (x=72)
+    draw.text((72, 92), "IRO", font=serif_brand, fill=blush)
+    draw.rectangle([72, 160, 168, 162], fill=blush)
 
-    # Moldura tipográfica minimalista na coluna esquerda
-    draw.rectangle([48, 52, 138, 54], fill=(109, 63, 40))  # #6D3F28
+    draw.text((72, 200), "Irondina", font=serif_regular, fill=alabaster)
+    draw.text((72, 266), "Mascarenhas", font=serif_regular, fill=blush)
+
+    draw.text((74, 360), "BEAUTY ARTIST · GOIÂNIA–GO", font=sans_meta, fill=sand)
+
+    draw.rectangle([72, 412, 118, 414], fill=blush)
+    draw.text((72, 436), "Make embelezadora.", font=serif_italic, fill=alabaster)
+    draw.text((72, 474), "Não transforma, realça.", font=serif_italic, fill=blush)
 
     og_webp = PUBLIC_DIR / "og-image.webp"
     og_jpg = PUBLIC_DIR / "og-image.jpg"
-    save_webp(canvas, og_webp, quality=86)
-    canvas.save(og_jpg, "JPEG", quality=86, optimize=True)
+    save_webp(canvas, og_webp, quality=88)
+    canvas.save(og_jpg, "JPEG", quality=88, optimize=True)
     print(f"  [OK] og-image.jpg (1200x630) -> {og_jpg.stat().st_size / 1024:.1f} KB")
 
 
