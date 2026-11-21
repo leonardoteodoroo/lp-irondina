@@ -1,0 +1,315 @@
+/* Tipografia Oficial Self-Hosted WOFF2 (SIL OFL) — EB Garamond + DM Sans */
+@import "@fontsource/eb-garamond/400.css";
+@import "@fontsource/eb-garamond/500.css";
+@import "@fontsource/eb-garamond/600.css";
+@import "@fontsource/eb-garamond/400-italic.css";
+@import "@fontsource/eb-garamond/500-italic.css";
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/600.css";
+
+@import "tailwindcss";
+
+/* ==========================================================================
+   CAMADA 1: TOKENS PRIMITIVOS (Paleta Oficial Elevada — Dark Luxe & Alabaster)
+   ========================================================================== */
+:root {
+  /* Neutros Quentes e Superfícies Claras */
+  --color-alabaster-50: #FAF8F5;   /* Fundo principal leve e clean */
+  --color-alabaster-100: #F3F0EB;  /* Superfície secundária alternada */
+  --color-stone-200: #E3E2DE;      /* Fundo oficial da logo — faixas e divisões */
+  --color-stone-300: #D0CFCB;      /* Swatch 1 oficial — bordas estruturais */
+
+  /* Acento Editorial Blush / Terracota Suave */
+  --color-blush-100: #F7EAE6;      /* Tint ultra-suave para badges/destaques */
+  --color-blush-400: #DFA194;      /* Swatch 2 oficial — acento editorial */
+  --color-blush-600: #B37266;      /* Versão aprofundada para ícones e detalhes */
+
+  /* Areia / Taupe */
+  --color-sand-300: #D4C5B7;       /* Texto suave sobre fundo escuro e divisores */
+  --color-sand-400: #B9A28E;       /* Swatch 3 oficial */
+
+  /* Marrom Expresso & Obsidian Quente (Palcos Cinematográficos de Alto Contraste) */
+  --color-espresso-700: #6D3F28;   /* Swatch 4 oficial — ação primária em fundo claro */
+  --color-espresso-800: #522E1C;   /* Estado hover da ação primária */
+  --color-espresso-900: #28201D;   /* Superfície escura elevada */
+  --color-espresso-950: #1E1816;   /* Texto principal e superfície escura de impacto */
+  --color-obsidian-950: #15100E;   /* Palco profundo da Hero Cinematográfica */
+
+  /* Cinzas Editoriais */
+  --color-slate-500: #666769;      /* Swatch 5 oficial — metadados e rótulos */
+  --color-slate-600: #5A5552;      /* Texto secundário aquecido */
+
+  /* Canal de Conversão */
+  --color-whatsapp-500: #176B3A;   /* Variante acessível WCAG AA (6.24:1 sobre #FAF8F5) */
+  --color-whatsapp-brand: #25D366; /* Indicador luminoso online */
+}
+
+/* ==========================================================================
+   CAMADA 2: TOKENS SEMÂNTICOS (Mapeamento por Propósito)
+   ========================================================================== */
+:root {
+  /* Superfícies */
+  --surface-page: var(--color-alabaster-50);
+  --surface-section: var(--color-alabaster-100);
+  --surface-editorial-band: var(--color-stone-200);
+  --surface-subtle: var(--color-blush-100);
+  --surface-impact-dark: var(--color-espresso-950);
+  --surface-stage-dark: var(--color-obsidian-950);
+
+  /* Gradientes de Transição Fluida entre Seções */
+  --gradient-gallery-to-services: linear-gradient(
+    180deg,
+    var(--color-alabaster-100) 0%,
+    var(--color-alabaster-50) 22%,
+    var(--color-alabaster-50) 84%,
+    var(--color-alabaster-100) 100%
+  );
+  --gradient-services-to-about: linear-gradient(
+    180deg,
+    var(--color-alabaster-50) 0%,
+    var(--color-alabaster-50) 75%,
+    var(--color-alabaster-100) 100%
+  );
+  --gradient-about-to-proof: linear-gradient(
+    180deg,
+    var(--color-alabaster-100) 0%,
+    var(--color-alabaster-50) 30%,
+    var(--color-alabaster-50) 100%
+  );
+  --gradient-proof-to-courses: linear-gradient(
+    180deg,
+    var(--color-alabaster-50) 0%,
+    var(--color-stone-200) 28%,
+    var(--color-stone-200) 100%
+  );
+  --gradient-courses-to-faq: linear-gradient(
+    180deg,
+    var(--color-stone-200) 0%,
+    var(--color-alabaster-50) 20%,
+    var(--color-alabaster-50) 100%
+  );
+
+  /* Tipografia */
+  --text-primary: var(--color-espresso-950);
+  --text-secondary: var(--color-slate-600);
+  --text-muted: var(--color-slate-500);
+  --text-on-action: var(--color-alabaster-50);
+  --text-on-dark: var(--color-alabaster-50);
+  --text-on-dark-muted: var(--color-sand-300);
+
+  /* Ações e Conversão */
+  --action-primary: var(--color-espresso-700);
+  --action-primary-hover: var(--color-espresso-800);
+  --action-primary-text: var(--text-on-action);
+  --action-secondary-border: var(--color-espresso-700);
+  --action-secondary-text: var(--color-espresso-700);
+  --action-whatsapp: var(--color-whatsapp-500);
+  --action-whatsapp-icon: var(--color-whatsapp-brand);
+
+  /* Acento Editorial e Bordas */
+  --accent-editorial: var(--color-blush-400);
+  --accent-editorial-strong: var(--color-blush-600);
+  --accent-sand: var(--color-sand-400);
+  --border-subtle: rgba(30, 24, 22, 0.10);
+  --border-default: var(--color-stone-300);
+  --border-medium: rgba(30, 24, 22, 0.22);
+  --border-focus: var(--color-espresso-700);
+  --border-on-dark: rgba(212, 197, 183, 0.18);
+
+  /* Famílias Tipográficas (EB Garamond + DM Sans) */
+  --font-display: 'EB Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Escala Fluida Resiliente a Fonte do SO */
+  --text-display-hero: clamp(2.35rem, 4.6vw + 0.5rem, 4.35rem);
+  --text-display-section: clamp(1.95rem, 3.3vw + 0.4rem, 3.25rem);
+  --text-heading-md: clamp(1.35rem, 1.8vw + 0.25rem, 1.75rem);
+  --text-lead: clamp(1rem, 0.45vw + 0.875rem, 1.125rem);
+  --text-body: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-micro: 0.75rem;
+
+  /* Ritmo de Leitura */
+  --leading-display: 1.06;
+  --leading-heading: 1.16;
+  --leading-body: 1.64;
+  --tracking-display: -0.02em;
+
+  /* Layout Full-Width & Espaçamento */
+  --container-gutter: clamp(1.25rem, 4.2vw, 4.5rem);
+  --container-max: 1280px;
+
+  /* Raios Contidos */
+  --radius-media: 4px;
+  --radius-panel: 8px;
+  --radius-modal: 12px;
+  --radius-pill: 9999px;
+
+  /* Sombras Sutilmente Aquecidas */
+  --shadow-subtle: 0 4px 20px rgba(21, 16, 14, 0.06);
+  --shadow-editorial: 0 20px 48px rgba(21, 16, 14, 0.14);
+  --shadow-floating: 0 12px 32px rgba(21, 16, 14, 0.24);
+  --shadow-modal: 0 28px 72px rgba(15, 11, 10, 0.55);
+
+  /* Z-Index Sistemático */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky: 20;
+  --z-floating-cta: 30;
+  --z-backdrop: 40;
+  --z-modal: 50;
+}
+
+/* ==========================================================================
+   CAMADA 3: ISOLAMENTO DA CAMADA DE IMPACTO ([data-surface="impact"])
+   ========================================================================== */
+[data-surface="impact"] {
+  background-color: var(--surface-impact-dark);
+  color: var(--text-on-dark);
+}
+
+/* ==========================================================================
+   BASE EDITORIAL, CALIBRAÇÃO TIPOGRÁFICA (IMPECCABLE TYPESET) & MOTION
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  line-height: var(--leading-body);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+p, dd, li, blockquote {
+  text-wrap: pretty;
+}
+
+::selection {
+  background-color: var(--accent-editorial);
+  color: var(--text-primary);
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.font-sans-editorial {
+  font-family: var(--font-sans);
+}
+
+.editorial-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-gutter);
+}
+
+/* Animação Cinematográfica Ken Burns (GPU-only transform) */
+@keyframes kenBurnsStage {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  50% {
+    transform: scale3d(1.045, 1.045, 1);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurnsStage 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Barra de progresso do Auto-Crossfade (GPU-only scaleX) */
+@keyframes progressFill {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.animate-progress-bar {
+  transform-origin: left center;
+  animation: progressFill 2.6s linear infinite;
+}
+
+/* Foco Visível Estrito WCAG */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+[data-surface="impact"] :focus-visible {
+  outline: 2px solid var(--accent-editorial);
+  outline-offset: 3px;
+}
+
+.cq-grid {
+  container-type: inline-size;
+}
+
+/* Native <dialog> Light-Dismiss, Centralização Real & Scroll Containment (modern-web-guidance) */
+dialog:modal {
+  margin: auto;
+  inset: 0;
+  width: min(calc(100vw - 2rem), 860px);
+  max-height: calc(100dvh - 2.5rem);
+  overscroll-behavior: contain;
+  border: 1px solid var(--border-default);
+  border-radius: 1rem;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-modal);
+  padding: 0;
+  overflow: hidden;
+}
+
+dialog::backdrop {
+  background-color: rgba(21, 16, 14, 0.78);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+details.editorial-faq > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+details.editorial-faq > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

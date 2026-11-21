@@ -1,0 +1,23 @@
+# Pastas internas de documentação, insumos brutos, dossiê, fontes e protótipos antigos
+_projeto/
+
+# Backup local da V1 (mantido fora do repositório remoto)
+backup-v1-atual/
+
+# Links locais de skills específicas desta máquina (não portáveis para o repositório público)
+.agents/
+
+# Build, dependências e variáveis locais
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+.env
+.env.*
+
+# Logs e arquivos de sistema
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

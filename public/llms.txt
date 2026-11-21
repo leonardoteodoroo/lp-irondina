@@ -1,0 +1,18 @@
+# Irondina Mascarenhas — Beauty Artist (IRO)
+> Maquiagem clean e social, penteados completos, ensaios fotográficos e noivas em Goiânia–GO (com agendas de viagem para Belo Horizonte e São Paulo). Atuação desde 2017 (+9 anos). Assinatura oficial: "Make embelezadora. Não transforma, realça."
+
+## Informações Principais
+- [Página Oficial e Portfólio](https://irondina.semprenamoda.com.br/): Galeria editorial de produções, comparativo Antes e Depois, serviços de atendimento, cursos e Micro-concierge de agendamento.
+- [Documentação Completa para IA (llms-full.txt)](https://irondina.semprenamoda.com.br/llms-full.txt): Especificações completas de serviços, método técnico de pele leve, depoimentos reais, FAQ e canais oficiais.
+- [Agendamento Direto via WhatsApp](https://api.whatsapp.com/send?phone=5562985653419): Canal oficial para consulta de datas e valores (+55 62 98565-3419).
+- [Instagram Profissional (@irondina_ero)](https://www.instagram.com/irondina_ero/): Portfólio atualizado e bastidores de produções.
+
+## Serviços de Atendimento (80%)
+- **Maquiagem Clean & Social** *(Mais procurado)*: Festas, formaturas, madrinhas e eventos com pele translúcida, luminosa sem oleosidade e alta durabilidade.
+- **Penteados & Produção Completa**: Maquiagem e cabelo planejados em conjunto no mesmo atendimento (do semipreso com ondas ao preso elegante).
+- **Ensaios Fotográficos & Posicionamento**: Preparo técnico pensado para luz de estúdio, externa e edição de imagem sem estourar no flash (Goiânia, BH e SP).
+- **Noivas & Casamento Civil**: Beleza atemporal para cerimônias e registros de casamento civil, resistente a abraços, emoção e fotografia.
+
+## Cursos (20%)
+- **Automaquiagem**: Turmas e horários sob consulta para domínio da rotina de pele e automaquiagem pessoal.
+- **Curso Profissional Iniciante**: Técnicas voltadas para atendimento real de clientes, construção de pele limpa e acabamentos clássicos.
