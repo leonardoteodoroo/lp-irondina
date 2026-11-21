@@ -203,38 +203,38 @@ def create_styled_placeholder(
         save_webp(out, dest_path, quality=82)
 
 
-def build_video_mvp() -> None:
+def _render_montage_from_segments(
+    segments: list[tuple[Path, float, float, float, int]],
+    xfade_dur: float,
+    transition_name: str,
+    poster_src: Path,
+    poster_ts: float,
+    poster_crop_y: int,
+    poster_out: Path,
+    webm_out: Path,
+    mp4_out: Path,
+) -> None:
     """
-    Recorta e converte o vídeo MVP mudo (< 1.5 MB) em WebM + MP4 + poster.webp
-    a partir de irondina_ero_3806533097748503741_2026-01-09.mp4.
+    Monta um showreel editorial sem áudio com aceleração (speed ramp) por clipe,
+    transições suaves (xfade), normalização de cor e saída dupla WebM VP9 + MP4 H.264.
+    segments: lista de (caminho_video, inicio_s, fim_s, fator_aceleracao, crop_y)
     """
-    src_video = (
-        INSUMOS_DIR
-        / "videos-reels"
-        / "irondina_ero_3806533097748503741_2026-01-09.mp4"
-    )
-    if not src_video.exists():
-        raise FileNotFoundError(f"Vídeo fonte não encontrado: {src_video}")
+    for src_path, *_ in segments:
+        if not src_path.exists():
+            raise FileNotFoundError(f"Vídeo fonte não encontrado: {src_path}")
 
-    webm_out = OUT_MEDIA / "video-mvp-galeria.webm"
-    mp4_out = OUT_MEDIA / "video-mvp-galeria.mp4"
-    poster_png = OUT_MEDIA / "_tmp_poster.png"
-    poster_webp = OUT_MEDIA / "video-mvp-poster.webp"
-
-    # Vídeo original é 720x1280 (9:16). Recortamos para 4:5 (720x900 -> 560x700 par) mantendo topo/rosto
-    vf_filter = "crop=720:900:0:90,scale=560:700:flags=lanczos,fps=24"
-
-    # 1. Poster frame em t=3.2s
+    # 1. Extrai poster WebP limpo do frame de abertura
+    poster_png = OUT_MEDIA / f"_tmp_{poster_out.stem}.png"
     subprocess.run(
         [
             "ffmpeg",
             "-y",
             "-ss",
-            "00:00:03.2",
+            f"{poster_ts:.2f}",
             "-i",
-            str(src_video),
+            str(poster_src),
             "-vf",
-            "crop=720:900:0:90,scale=720:900:flags=lanczos",
+            f"crop=720:900:0:{poster_crop_y},scale=720:900:flags=lanczos",
             "-frames:v",
             "1",
             str(poster_png),
@@ -244,30 +244,77 @@ def build_video_mvp() -> None:
         stderr=subprocess.DEVNULL,
     )
     with Image.open(poster_png) as p_img:
-        save_webp(p_img, poster_webp, quality=84)
+        save_webp(p_img, poster_out, quality=84)
     if poster_png.exists():
         subprocess.run(["gio", "trash", str(poster_png)], check=False)
 
-    # 2. WebM (VP9 mudo < 1.5 MB)
+    # 2. Monta grafo de filtros com speed-up e xfade sincronizado
+    cmd_inputs: list[str] = ["ffmpeg", "-y"]
+    filter_parts: list[str] = []
+    durations: list[float] = []
+
+    for idx, (src_path, start_s, end_s, speed, crop_y) in enumerate(segments):
+        cmd_inputs.extend(["-ss", f"{start_s:.2f}", "-t", f"{end_s - start_s:.2f}", "-i", str(src_path)])
+        durations.append((end_s - start_s) / speed)
+        # Normaliza FPS, timebase, aceleração e proporção 4:5 (560x700)
+        filter_parts.append(
+            f"[{idx}:v]fps=30,format=yuv420p,setpts=(PTS-STARTPTS)/{speed:.4f},"
+            f"crop=720:900:0:{crop_y},scale=560:700:flags=lanczos,"
+            f"eq=contrast=1.03:saturation=1.04,settb=AVTB[v{idx}]"
+        )
+
+    last_label = "[v0]"
+    cumulative = durations[0]
+    for idx in range(1, len(segments)):
+        offset = max(0.05, cumulative - xfade_dur)
+        next_label = f"[x{idx}]" if idx < len(segments) - 1 else "[vout]"
+        filter_parts.append(
+            f"{last_label}[v{idx}]xfade=transition={transition_name}:duration={xfade_dur:.2f}:offset={offset:.3f}{next_label}"
+        )
+        last_label = next_label
+        cumulative = offset + durations[idx]
+
+    filter_complex = ";".join(filter_parts)
+    master_mp4 = OUT_MEDIA / f"_tmp_{mp4_out.stem}_master.mp4"
+
+    # 3. Renderiza master intermediário CRF 14
+    subprocess.run(
+        [
+            *cmd_inputs,
+            "-an",
+            "-filter_complex",
+            filter_complex,
+            "-map",
+            "[vout]",
+            "-c:v",
+            "libx264",
+            "-crf",
+            "14",
+            "-preset",
+            "medium",
+            "-pix_fmt",
+            "yuv420p",
+            str(master_mp4),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    # 4. WebM (VP9 otimizado para web)
     subprocess.run(
         [
             "ffmpeg",
             "-y",
-            "-ss",
-            "00:00:01.5",
-            "-t",
-            "00:00:06.5",
             "-i",
-            str(src_video),
+            str(master_mp4),
             "-an",
-            "-vf",
-            vf_filter,
             "-c:v",
             "libvpx-vp9",
             "-b:v",
             "0",
             "-crf",
-            "34",
+            "33",
             "-row-mt",
             "1",
             "-pix_fmt",
@@ -279,24 +326,18 @@ def build_video_mvp() -> None:
         stderr=subprocess.DEVNULL,
     )
 
-    # 3. MP4 (H.264 mudo < 1.5 MB)
+    # 5. MP4 (H.264 universal +faststart)
     subprocess.run(
         [
             "ffmpeg",
             "-y",
-            "-ss",
-            "00:00:01.5",
-            "-t",
-            "00:00:06.5",
             "-i",
-            str(src_video),
+            str(master_mp4),
             "-an",
-            "-vf",
-            vf_filter,
             "-c:v",
             "libx264",
             "-crf",
-            "26",
+            "25",
             "-preset",
             "slow",
             "-movflags",
@@ -310,11 +351,71 @@ def build_video_mvp() -> None:
         stderr=subprocess.DEVNULL,
     )
 
-    print(
-        f"  [OK] video-mvp-galeria.webm -> {webm_out.stat().st_size / 1024:.1f} KB"
+    if master_mp4.exists():
+        subprocess.run(["gio", "trash", str(master_mp4)], check=False)
+
+    print(f"  [OK] {webm_out.name} -> {webm_out.stat().st_size / 1024:.1f} KB")
+    print(f"  [OK] {mp4_out.name}  -> {mp4_out.stat().st_size / 1024:.1f} KB")
+
+
+def build_video_mvp() -> None:
+    """
+    Vídeo 01 (Seção 02 — Galeria): Montagem dinâmica acelerada de 5 modelos prontas
+    (Raila, Faah Gomes, Cliente loira, Produção noturna e Morena sorrindo), mudo e sem texto.
+    """
+    vdir = INSUMOS_DIR / "videos-reels"
+    v1 = vdir / "irondina_ero_3997558677174646392_2026-09-30.mp4"
+    v4 = vdir / "irondina_ero_3495587945390659397_2024-11-06.mp4"
+    v2 = vdir / "irondina_ero_3806533097748503741_2026-01-09.mp4"
+    v6 = vdir / "irondina_ero_3282912122597067321_2024-01-18.mp4"
+    v7 = vdir / "irondina_ero_3093791015533217140_2023-05-02.mp4"
+
+    segments = [
+        (v1, 0.4, 3.6, 1.30, 65),    # Raila Almeida pronta (close)
+        (v4, 10.6, 14.2, 1.30, 80),  # Faah Gomes pronta (ondas glam)
+        (v2, 11.0, 14.8, 1.30, 85),  # Cliente loira sorriso final
+        (v6, 27.4, 31.0, 1.35, 85),  # Produção social noturna
+        (v7, 11.2, 14.8, 1.35, 80),  # Cliente morena sorrindo
+    ]
+
+    _render_montage_from_segments(
+        segments=segments,
+        xfade_dur=0.32,
+        transition_name="smoothleft",
+        poster_src=v1,
+        poster_ts=1.2,
+        poster_crop_y=65,
+        poster_out=OUT_MEDIA / "video-mvp-poster.webp",
+        webm_out=OUT_MEDIA / "video-mvp-galeria.webm",
+        mp4_out=OUT_MEDIA / "video-mvp-galeria.mp4",
     )
-    print(
-        f"  [OK] video-mvp-galeria.mp4  -> {mp4_out.stat().st_size / 1024:.1f} KB"
+
+
+def build_video_about_broll() -> None:
+    """
+    Vídeo 02 (Seção 04 — Sobre & Estúdio): Montagem dinâmica de bancada Chanel/Dior
+    + acabamento de estúdio + Irondina finalizando cabelo em set iluminado.
+    """
+    vdir = INSUMOS_DIR / "videos-reels"
+    v5 = vdir / "anna.costa.a_3286847687659092550_2024-01-23.mp4"
+    v1 = vdir / "irondina_ero_3997558677174646392_2026-09-30.mp4"
+
+    segments = [
+        (v5, 9.2, 13.0, 1.50, 140),  # Close produtos Chanel & Dior
+        (v1, 44.4, 46.8, 1.30, 85),  # Acabamento técnico labial no estúdio
+        (v5, 47.2, 51.8, 1.35, 40),  # Irondina em ação finalizando cachos
+    ]
+
+    _render_montage_from_segments(
+        segments=segments,
+        xfade_dur=0.30,
+        transition_name="fade",
+        poster_src=v5,
+        poster_ts=49.0,
+        poster_crop_y=40,
+        poster_out=OUT_MEDIA / "video-sobre-poster.webp",
+        webm_out=OUT_MEDIA / "video-sobre-bastidores.webm",
+        mp4_out=OUT_MEDIA / "video-sobre-bastidores.mp4",
     )
 
 
@@ -461,48 +562,48 @@ def main() -> None:
             quality=83,
         )
 
-    # 2. Galeria & Serviços (Proporções 4:5, 3:4, 1:1)
-    print("\n2. Processando fotos eleitas da Galeria e Serviços...")
+    # 2. Galeria & Serviços (Proporção padronizada 4:5 = 720x900 para evitar layout shift)
+    print("\n2. Processando fotos eleitas da Galeria e Serviços (padrão 4:5)...")
     gallery_specs = [
         # (Tag, output_name, width, height)
-        ("IG-09", "ig-09.webp", 720, 900),    # 4:5 Social Make + Penteado
-        ("IG-10", "ig-10.webp", 720, 900),    # 4:5 Social Nanda Soares
-        ("IG-11", "ig-11.webp", 720, 900),    # 4:5 Social Resultado sorrindo
-        ("IG-12", "ig-12.webp", 720, 900),    # 4:5 Social Rafaella Lopes
-        ("IG-16", "ig-16.webp", 720, 720),    # 1:1 Close delineado
-        ("IG-18", "ig-18.webp", 720, 900),    # 4:5 Social pêssego/champagne
-        ("IG-19", "ig-19.webp", 720, 900),    # 4:5 Social sardas naturais
-        ("IG-20", "ig-20.webp", 720, 900),    # 4:5 Social pele negra + cachos
-        ("IG-24", "ig-24.webp", 720, 900),    # 4:5 Social olhos verdes
-        ("IG-28", "ig-28.webp", 720, 900),    # 4:5 Social ondas longas
-        ("IG-49", "ig-49.webp", 720, 900),    # 4:5 Social rabo meio alto
-        ("IG-58", "ig-58.webp", 720, 900),    # 4:5 Social clássica
-        ("IG-59", "ig-59.webp", 720, 900),    # 4:5 Penteado preso coque
-        ("IG-66", "ig-66.webp", 720, 900),    # 4:5 Penteado rabo alto
+        ("IG-09", "ig-09.webp", 720, 900),
+        ("IG-10", "ig-10.webp", 720, 900),
+        ("IG-11", "ig-11.webp", 720, 900),
+        ("IG-12", "ig-12.webp", 720, 900),
+        ("IG-16", "ig-16.webp", 720, 900),
+        ("IG-18", "ig-18.webp", 720, 900),
+        ("IG-19", "ig-19.webp", 720, 900),
+        ("IG-20", "ig-20.webp", 720, 900),
+        ("IG-24", "ig-24.webp", 720, 900),
+        ("IG-28", "ig-28.webp", 720, 900),
+        ("IG-49", "ig-49.webp", 720, 900),
+        ("IG-58", "ig-58.webp", 720, 900),
+        ("IG-59", "ig-59.webp", 720, 900),
+        ("IG-66", "ig-66.webp", 720, 900),
         # Ensaios
-        ("IG-01", "ig-01.webp", 750, 1000),   # 3:4 Fernanda Rodrigues coque alto
-        ("IG-03", "ig-03.webp", 750, 1000),   # 3:4 Fernanda Rodrigues cachos 3D
-        ("IG-13", "ig-13.webp", 720, 900),    # 4:5 Lourrainy corporativo
-        ("IG-15", "ig-15.webp", 720, 900),    # 4:5 Lourrainy cubo
-        ("IG-32", "ig-32.webp", 720, 900),    # 4:5 Poliana Souza
-        ("IG-33", "ig-33.webp", 720, 900),    # 4:5 Poliana Souza skincare
-        ("IG-37", "ig-37.webp", 720, 900),    # 4:5 Lash designer bege
-        ("IG-38", "ig-38.webp", 720, 720),    # 1:1 Sara Lidia
-        ("IG-44", "ig-44.webp", 720, 900),    # 4:5 Blazer bege
+        ("IG-01", "ig-01.webp", 720, 900),
+        ("IG-03", "ig-03.webp", 720, 900),
+        ("IG-13", "ig-13.webp", 720, 900),
+        ("IG-15", "ig-15.webp", 720, 900),
+        ("IG-32", "ig-32.webp", 720, 900),
+        ("IG-33", "ig-33.webp", 720, 900),
+        ("IG-37", "ig-37.webp", 720, 900),
+        ("IG-38", "ig-38.webp", 720, 900),
+        ("IG-44", "ig-44.webp", 720, 900),
         # Noivas & Civil
-        ("IG-30", "ig-30.webp", 720, 900),    # 4:5 Renata Felipe close make/trança
-        ("IG-31", "ig-31.webp", 720, 900),    # 4:5 Renata Felipe sorrindo
+        ("IG-30", "ig-30.webp", 720, 900),
+        ("IG-31", "ig-31.webp", 720, 900),
         # Antes & Depois
-        ("IG-04", "ig-04-antes.webp", 750, 1000),        # 3:4 Berta Leite Antes
-        ("IG-05", "ig-05-depois-olhos.webp", 750, 1000), # 3:4 Berta Leite Depois olhos fechados + painel
-        ("IG-06", "ig-06-depois.webp", 750, 1000),       # 3:4 Berta Leite Depois olhos abertos
+        ("IG-04", "ig-04-antes.webp", 720, 900),
+        ("IG-05", "ig-05-depois-olhos.webp", 720, 900),
+        ("IG-06", "ig-06-depois.webp", 720, 900),
         # Sobre (Sec 04)
-        ("IRO-04", "iro-04.webp", 750, 1000),            # 3:4 Irondina blazer bege (reserva)
-        ("IRO-06", "iro-06.webp", 750, 1000),            # 3:4 Irondina estúdio confiante
-        ("IRO-03", "iro-03.webp", 750, 1000),            # 3:4 Irondina golden hour
-        ("IRO-01", "iro-01.webp", 750, 1000),            # 3:4 Irondina golden hour 1
+        ("IRO-04", "iro-04.webp", 750, 1000),
+        ("IRO-06", "iro-06.webp", 720, 900),
+        ("IRO-03", "iro-03.webp", 750, 1000),
+        ("IRO-01", "iro-01.webp", 750, 1000),
         # Cursos (Sec 06)
-        ("IG-41", "ig-41-curso.webp", 720, 900),         # 4:5 Curso Profissional Iniciante
+        ("IG-41", "ig-41-curso.webp", 720, 900),
     ]
 
     for tag, out_name, w, h in gallery_specs:
@@ -560,9 +661,10 @@ def main() -> None:
         mode="avatar",
     )
 
-    # 5. Vídeo MVP Mudo (< 1.5 MB)
-    print("\n5. Gerando Vídeo MVP Mudo (WebM + MP4 + poster.webp)...")
+    # 5. Vídeos Editoriais Mudos (Showreel de Modelos + Bastidores & Bancada)
+    print("\n5. Gerando Montagens Editoriais Mudas (Showreel Modelos + Bastidores)...")
     build_video_mvp()
+    build_video_about_broll()
 
     # 6. Open Graph 1200x630
     print("\n6. Gerando Open Graph Image (1200x630)...")

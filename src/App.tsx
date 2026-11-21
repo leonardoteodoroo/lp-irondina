@@ -9,12 +9,13 @@ import { Sec06Cursos } from './sections/sec-06-cursos';
 import { Sec07Faq } from './sections/sec-07-faq';
 import { Sec08CtaConcierge } from './sections/sec-08-cta-concierge';
 import { Sec09Footer } from './sections/sec-09-footer';
+import { Sec10GmbMockup } from './sections/sec-10-gmb-mockup';
 
 export const App: React.FC = () => {
   return (
-    <div className="min-h-dvh flex flex-col bg-[var(--surface-page)] text-[var(--text-primary)]">
+    <div className="min-h-dvh w-full max-w-[100vw] overflow-x-clip flex flex-col bg-[var(--surface-page)] text-[var(--text-primary)]">
       <Sec00Header />
-      <main id="conteudo-principal" className="flex-1">
+      <main id="conteudo-principal" className="flex-1 w-full overflow-x-clip">
         <Sec01Hero />
         <Sec02Galeria />
         <Sec03Servicos />
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
         <Sec08CtaConcierge />
       </main>
       <Sec09Footer />
+      <Sec10GmbMockup />
     </div>
   );
 };

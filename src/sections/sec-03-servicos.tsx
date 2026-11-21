@@ -44,8 +44,8 @@ export const Sec03Servicos: React.FC = () => {
               return (
                 <div
                   key={service.id}
-                  className={`py-4 sm:py-6 transition-colors duration-300 ${
-                    isOpen ? 'bg-[var(--surface-section)]/60 -mx-3 px-3 rounded-xl' : ''
+                  className={`py-4 sm:py-6 px-3 transition-colors duration-300 rounded-xl ${
+                    isOpen ? 'bg-[var(--surface-section)]/65' : ''
                   }`}
                 >
                   <button

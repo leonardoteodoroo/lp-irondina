@@ -50,8 +50,8 @@ export const Sec07Faq: React.FC = () => {
               return (
                 <div
                   key={faq.id}
-                  className={`py-3.5 transition-colors duration-300 ${
-                    isOpen ? 'bg-[var(--surface-section)]/60 -mx-3 px-3 rounded-xl' : ''
+                  className={`py-3.5 px-3 transition-colors duration-300 rounded-xl ${
+                    isOpen ? 'bg-[var(--surface-section)]/65' : ''
                   }`}
                 >
                   <button

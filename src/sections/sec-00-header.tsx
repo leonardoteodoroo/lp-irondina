@@ -34,13 +34,13 @@ export const Sec00Header: React.FC = () => {
           <span className="sr-only"> — Início</span>
         </a>
 
-        {/* Links de Navegação (4 âncoras em uppercase elegante como no protótipo Stitch) */}
-        <nav aria-label="Navegação principal" className="flex items-center gap-0.5 sm:gap-3 lg:gap-6">
+        {/* Links de Navegação (4 âncoras compactas sem estouro no mobile) */}
+        <nav aria-label="Navegação principal" className="flex items-center gap-0.5 sm:gap-3 lg:gap-6 min-w-0">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="inline-flex items-center justify-center min-h-[48px] px-2 sm:px-3 text-[0.72rem] sm:text-xs uppercase tracking-[0.12em] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-180"
+              className="inline-flex items-center justify-center min-h-[48px] px-1.5 sm:px-3 text-[0.66rem] sm:text-xs uppercase tracking-[0.06em] sm:tracking-[0.12em] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-180 whitespace-nowrap"
             >
               {link.label}
             </a>
@@ -50,7 +50,7 @@ export const Sec00Header: React.FC = () => {
         {/* Botão Pill Discreto Direita: Agendar */}
         <a
           href="#agendar"
-          className="inline-flex items-center justify-center min-h-[42px] sm:min-h-[44px] px-4 sm:px-6 rounded-full border border-[var(--action-secondary-border)] text-xs font-medium tracking-[0.06em] text-[var(--action-secondary-text)] hover:bg-[var(--action-primary)] hover:text-[var(--action-primary-text)] transition-all duration-200 shrink-0"
+          className="inline-flex items-center justify-center min-h-[40px] sm:min-h-[44px] px-3 sm:px-6 rounded-full border border-[var(--action-secondary-border)] text-[0.72rem] sm:text-xs font-medium tracking-[0.04em] sm:tracking-[0.06em] text-[var(--action-secondary-text)] hover:bg-[var(--action-primary)] hover:text-[var(--action-primary-text)] transition-all duration-200 shrink-0"
         >
           Agendar
         </a>

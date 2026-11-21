@@ -194,9 +194,9 @@ export const Sec01Hero: React.FC = () => {
             </a>
           </div>
 
-          {/* Indicador sutil da cena ativa no palco automático */}
-          <div className="mt-7 flex items-center gap-3 text-xs text-[var(--color-sand-300)]/80">
-            <div className="flex items-center gap-1.5" aria-hidden="true">
+          {/* Indicador sutil de altura fixa para evitar refluxo na troca automática */}
+          <div className="mt-7 h-5 flex items-center gap-3 text-xs text-[var(--color-sand-300)]/80 overflow-hidden w-full">
+            <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
               {HERO_SCENES.map((s, idx) => (
                 <span
                   key={s.id}
@@ -208,7 +208,7 @@ export const Sec01Hero: React.FC = () => {
                 />
               ))}
             </div>
-            <span>{HERO_SCENES[activeScene].caption}</span>
+            <span className="truncate">{HERO_SCENES[activeScene].caption}</span>
           </div>
         </motion.div>
       </div>

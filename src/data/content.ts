@@ -53,6 +53,10 @@ import videoMvpWebm from '../assets/media/video-mvp-galeria.webm';
 import videoMvpMp4 from '../assets/media/video-mvp-galeria.mp4';
 import videoMvpPoster from '../assets/media/video-mvp-poster.webp';
 
+import videoSobreWebm from '../assets/media/video-sobre-bastidores.webm';
+import videoSobreMp4 from '../assets/media/video-sobre-bastidores.mp4';
+import videoSobrePoster from '../assets/media/video-sobre-poster.webp';
+
 export const WHATSAPP_NUMBER = '5562985653419';
 export const WHATSAPP_DISPLAY = '(62) 98565-3419';
 export const INSTAGRAM_URL = 'https://www.instagram.com/irondina_ero/';
@@ -90,6 +94,11 @@ export const MEDIA = {
     mainPortrait: iro03,
     secondaryPortrait: iro06,
     studioPanel: ig05DepoisOlhos,
+    brollVideo: {
+      webm: videoSobreWebm,
+      mp4: videoSobreMp4,
+      poster: videoSobrePoster,
+    },
   },
   courses: {
     profissional: ig41Curso,
@@ -212,8 +221,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Pálpebra clara acetinada, delineado gráfico fino e pele uniforme sob luz natural.',
     src: ig16,
     width: 720,
-    height: 720,
-    aspectClass: 'aspect-square',
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-19',
@@ -286,9 +295,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Pele negra iluminada pensada para flash de estúdio e edição fotográfica, sem estourar.',
     credit: 'Foto: @darahcoelho · Hair: @luiza_trancistx · Cliente: @fer.nandaugc',
     src: ig01,
-    width: 750,
-    height: 1000,
-    aspectClass: 'aspect-[3/4]',
+    width: 720,
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-03',
@@ -299,9 +308,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Acabamento glow quente e contorno labial equilibrado sob iluminação contínua de estúdio.',
     credit: 'Foto: @darahcoelho · Hair: @luiza_trancistx · Cliente: @fer.nandaugc',
     src: ig03,
-    width: 750,
-    height: 1000,
-    aspectClass: 'aspect-[3/4]',
+    width: 720,
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-13',
@@ -339,8 +348,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     credit: 'Cliente: @saralidiamorais',
     src: ig38,
     width: 720,
-    height: 720,
-    aspectClass: 'aspect-square',
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-33',
@@ -444,9 +453,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Registro prévio sem maquiagem evidenciando o ponto de partida real para construção de camadas leves.',
     credit: 'Cliente: @leiteberta',
     src: ig04Antes,
-    width: 750,
-    height: 1000,
-    aspectClass: 'aspect-[3/4]',
+    width: 720,
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-06-ba',
@@ -457,9 +466,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Acabamento leve e viçoso que realça traços e preserva a naturalidade diante do painel oficial do estúdio.',
     credit: 'Cliente: @leiteberta',
     src: ig06Depois,
-    width: 750,
-    height: 1000,
-    aspectClass: 'aspect-[3/4]',
+    width: 720,
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-05-ba',
@@ -470,9 +479,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Sombra champagne suave, delineado fino e preenchimento de sobrancelha respeitando o subtom ruivo.',
     credit: 'Cliente: @leiteberta',
     src: ig05DepoisOlhos,
-    width: 750,
-    height: 1000,
-    aspectClass: 'aspect-[3/4]',
+    width: 720,
+    height: 900,
+    aspectClass: 'aspect-[4/5]',
   },
   {
     id: 'gal-ig-11-ba',

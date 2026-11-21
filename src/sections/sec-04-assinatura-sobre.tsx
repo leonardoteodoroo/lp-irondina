@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MEDIA } from '../data/content';
 
 export const Sec04AssinaturaSobre: React.FC = () => {
+  const brollRef = useRef<HTMLVideoElement>(null);
+
+  // Carrega e reproduz o vídeo de bastidores apenas quando a seção entra em visibilidade (CWV otimizado)
+  useEffect(() => {
+    const videoEl = brollRef.current;
+    if (!videoEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(videoEl);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section
       id="sobre"
       aria-labelledby="sobre-heading"
-      className="w-full py-16 lg:py-24"
+      className="w-full py-16 lg:py-24 overflow-x-clip"
       style={{ background: 'var(--gradient-about-to-proof)' }}
     >
       <div className="editorial-container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          {/* Composição Fotográfica Real Estilo Revista (IRO-04 com Monograma Overlay + IRO-03 + Painel IG-05) */}
+          {/* Composição Editorial: Retrato IRO-03 + IRO-06 + Vídeo de Bastidores & Bancada (Sem fotos repetidas) */}
           <div className="lg:col-span-6 grid grid-cols-12 gap-3.5 sm:gap-5 items-end relative">
-            {/* Retrato Principal IRO-04 (Alfaiataria bege, 3:4) */}
+            {/* Retrato Principal IRO-03 (Golden Hour, 3:4) */}
             <figure className="col-span-7 relative overflow-hidden rounded-[var(--radius-media)] aspect-[3/4] bg-[var(--color-espresso-950)] shadow-[var(--shadow-editorial)]">
               <img
                 src={MEDIA.about.mainPortrait}
@@ -24,7 +44,7 @@ export const Sec04AssinaturaSobre: React.FC = () => {
                 decoding="async"
                 className="w-full h-full object-cover"
               />
-              {/* Selo Monograma IRO no canto superior direito (inspirado no protótipo Stitch) */}
+              {/* Selo Monograma IRO no canto superior direito */}
               <div
                 className="absolute top-3.5 right-3.5 bg-[var(--color-alabaster-50)]/92 backdrop-blur-xs px-3 py-2 rounded-[var(--radius-media)] border border-[var(--border-default)] text-center"
                 aria-hidden="true"
@@ -43,14 +63,14 @@ export const Sec04AssinaturaSobre: React.FC = () => {
               </figcaption>
             </figure>
 
-            {/* Coluna Lateral com IRO-03 (Golden Hour) e IG-05 (Painel Assinado do Estúdio) */}
+            {/* Coluna Lateral com IRO-06 (Estúdio) e Vídeo 02 (Bastidores & Bancada Chanel/Dior) */}
             <div className="col-span-5 flex flex-col gap-3.5 sm:gap-5">
-              <figure className="overflow-hidden rounded-[var(--radius-media)] aspect-[3/4] bg-[var(--surface-editorial-band)] shadow-[var(--shadow-subtle)]">
+              <figure className="overflow-hidden rounded-[var(--radius-media)] aspect-[4/5] bg-[var(--surface-editorial-band)] shadow-[var(--shadow-subtle)]">
                 <img
                   src={MEDIA.about.secondaryPortrait}
                   alt="Irondina Mascarenhas em ensaio editorial de estúdio"
-                  width={750}
-                  height={1000}
+                  width={720}
+                  height={900}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
@@ -58,17 +78,27 @@ export const Sec04AssinaturaSobre: React.FC = () => {
               </figure>
 
               <figure className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[4/5] bg-[var(--color-espresso-950)] shadow-[var(--shadow-subtle)]">
-                <img
-                  src={MEDIA.about.studioPanel}
-                  alt="Estúdio próprio com painel assinado Irondina Mascarenhas Beauty Artist"
-                  width={750}
-                  height={1000}
-                  loading="lazy"
-                  decoding="async"
+                <video
+                  ref={brollRef}
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  poster={MEDIA.about.brollVideo.poster}
+                  width={560}
+                  height={700}
+                  aria-label="Bastidores de bancada e finalização de produção por Irondina Mascarenhas no estúdio"
                   className="w-full h-full object-cover"
-                />
-                <figcaption className="absolute bottom-0 inset-x-0 bg-[var(--color-espresso-950)]/85 px-2.5 py-1.5 text-[0.7rem] text-[var(--color-alabaster-50)] font-medium">
-                  Estúdio Próprio · Goiânia
+                >
+                  <source src={MEDIA.about.brollVideo.webm} type="video/webm" />
+                  <source src={MEDIA.about.brollVideo.mp4} type="video/mp4" />
+                </video>
+                <figcaption className="absolute bottom-0 inset-x-0 bg-[var(--color-espresso-950)]/85 px-2.5 py-1.5 text-[0.7rem] text-[var(--color-alabaster-50)] font-medium flex items-center gap-1.5">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-[var(--color-blush-400)] animate-pulse shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">Estúdio Próprio · Goiânia</span>
                 </figcaption>
               </figure>
             </div>

@@ -237,7 +237,7 @@ export const Sec02Galeria: React.FC = () => {
                     }`}
                     aria-hidden="true"
                   />
-                  <span className="text-[0.72rem] text-[var(--color-sand-300)] font-medium">
+                  <span className="min-w-[144px] text-center whitespace-nowrap text-[0.72rem] text-[var(--color-sand-300)] font-medium">
                     {afterPose === 'open' ? 'Depois: Olhos abertos' : 'Depois: Detalhe pálpebra'}
                   </span>
                   <button
@@ -329,7 +329,7 @@ export const Sec02Galeria: React.FC = () => {
               </p>
             </div>
 
-            {/* Slot de Vídeo MVP Mudo (< 1.5 MB) com Tag HTML Central TROCAR */}
+            {/* Showreel Dinâmico de 5 Modelos Prontas (Sem áudio e sem tarja sobre os rostos) */}
             <div className="lg:col-span-4 flex flex-col justify-between">
               <div className="flex items-center justify-between mb-3.5 min-h-[28px]">
                 <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-[var(--color-alabaster-50)]">
@@ -350,14 +350,16 @@ export const Sec02Galeria: React.FC = () => {
                   poster={MEDIA.videoMvp.poster}
                   width={560}
                   height={700}
-                  aria-label="Vídeo demonstrando textura real e acabamento de pele sob luz de estúdio"
+                  aria-label="Montagem acelerada com produções reais finalizadas em luz de estúdio por Irondina Mascarenhas"
                   className="w-full h-full object-cover"
                 >
                   <source src={MEDIA.videoMvp.webm} type="video/webm" />
                   <source src={MEDIA.videoMvp.mp4} type="video/mp4" />
                 </video>
 
-                <TrocarBadge label={MEDIA.videoMvp.trocarLabel} />
+                <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-[var(--radius-media)] bg-[#15100E]/82 backdrop-blur-xs text-[0.68rem] font-medium text-[var(--color-alabaster-50)] border border-[var(--border-on-dark)]">
+                  5 produções reais em movimento · Goiânia–GO
+                </span>
               </div>
 
               <p className="mt-3.5 text-xs sm:text-sm text-[var(--color-sand-300)] leading-relaxed">
@@ -405,9 +407,9 @@ export const Sec02Galeria: React.FC = () => {
             })}
           </div>
 
-          {/* Palco Deslizável (Swipe Touch & Mouse Drag) em Grade 2x2 (2 linhas × 2 colunas = 4 fotos por dobra) */}
+          {/* Palco Deslizável Contido (overflow-hidden + 4 fotos 4:5 idênticas por dobra) */}
           <div
-            className="mt-4 sm:mt-5 relative touch-pan-y select-none cursor-grab active:cursor-grabbing"
+            className="mt-4 sm:mt-5 relative overflow-hidden w-full touch-pan-y select-none cursor-grab active:cursor-grabbing"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleMouseDown}
@@ -417,24 +419,24 @@ export const Sec02Galeria: React.FC = () => {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={`${activeCategory}-${safePageIndex}`}
-                initial={{ opacity: 0, x: direction > 0 ? 28 : -28 }}
+                initial={{ opacity: 0, x: direction > 0 ? 18 : -18 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: direction > 0 ? -28 : 28 }}
-                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 items-start"
+                exit={{ opacity: 0, x: direction > 0 ? -18 : 18 }}
+                transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 items-stretch"
               >
                 {currentItems.map((item) => (
                   <article key={item.id} className="group flex flex-col">
                     <button
                       type="button"
                       onClick={() => openLightbox(item)}
-                      className="relative w-full overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] aspect-[4/4.3] max-h-[210px] sm:max-h-[290px] cursor-pointer text-left shadow-xs focus-visible:outline-2 focus-visible:outline-[var(--border-focus)]"
+                      className="relative w-full overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] aspect-[4/5] cursor-pointer text-left shadow-xs focus-visible:outline-2 focus-visible:outline-[var(--border-focus)]"
                     >
                       <img
                         src={item.src}
                         alt={`Ampliar produção: ${item.title} — ${item.description}`}
-                        width={item.width}
-                        height={item.height}
+                        width={720}
+                        height={900}
                         loading="lazy"
                         decoding="async"
                         draggable={false}
@@ -456,7 +458,7 @@ export const Sec02Galeria: React.FC = () => {
                       </span>
                     </button>
 
-                    <div className="mt-2 flex flex-col px-0.5">
+                    <div className="mt-2 flex flex-col px-0.5 h-[3.4rem] sm:h-[3.9rem] overflow-hidden">
                       <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.12em] font-semibold text-[var(--action-primary)] truncate">
                         {item.category}
                       </span>

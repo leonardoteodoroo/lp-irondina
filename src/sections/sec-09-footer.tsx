@@ -10,31 +10,33 @@ export const Sec09Footer: React.FC = () => {
   const creditsDialogRef = useRef<HTMLDialogElement>(null);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
 
-  // Oculta o botão flutuante quando o visitante está na Hero (#hero) ou na Seção 08 (#agendar)
+  // Oculta o botão flutuante na Hero, CTA Concierge, Footer e Mockup GMB
   useEffect(() => {
-    const heroEl = document.getElementById('hero');
-    const conciergeEl = document.getElementById('agendar');
-    if (!heroEl || !conciergeEl) return;
+    const targets = [
+      document.getElementById('hero'),
+      document.getElementById('agendar'),
+      document.querySelector('footer'),
+      document.getElementById('google-meu-negocio-preview'),
+    ].filter((el): el is HTMLElement => el !== null);
 
-    let heroVisible = true;
-    let conciergeVisible = false;
+    if (targets.length === 0) return;
+
+    const visibleMap = new Map<Element, boolean>();
+    const heroEl = document.getElementById('hero');
+    if (heroEl) visibleMap.set(heroEl, true);
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.target.id === 'hero') {
-            heroVisible = entry.isIntersecting;
-          } else if (entry.target.id === 'agendar') {
-            conciergeVisible = entry.isIntersecting;
-          }
+          visibleMap.set(entry.target, entry.isIntersecting);
         }
-        setShowFloatingCta(!heroVisible && !conciergeVisible);
+        const hideFloating = Array.from(visibleMap.values()).some(Boolean);
+        setShowFloatingCta(!hideFloating);
       },
-      { threshold: 0.12 }
+      { threshold: 0.08 }
     );
 
-    observer.observe(heroEl);
-    observer.observe(conciergeEl);
+    for (const el of targets) observer.observe(el);
     return () => observer.disconnect();
   }, []);
 

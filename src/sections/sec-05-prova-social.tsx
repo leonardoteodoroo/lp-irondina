@@ -7,7 +7,7 @@ export const Sec05ProvaSocial: React.FC = () => {
     <section
       id="prova-social"
       aria-labelledby="prova-social-heading"
-      className="w-full py-16 lg:py-24"
+      className="w-full py-16 lg:py-24 overflow-x-clip"
       style={{ background: 'var(--gradient-proof-to-courses)' }}
     >
       <div className="editorial-container">
@@ -23,35 +23,29 @@ export const Sec05ProvaSocial: React.FC = () => {
           </h2>
         </div>
 
-        {/* Faixa A — Grade 2x3 Proporcional (2 Colunas Lado a Lado no Mobile, 3 no Desktop) */}
+        {/* Faixa A — Grade 2x3 Proporcional Padronizada (Todos os avatares exatamente do mesmo tamanho) */}
         <div className="mt-8 cq-grid">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-8 sm:gap-y-10">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 items-stretch">
             {TESTIMONIALS_LIST.map((item) => (
               <article
                 key={item.id}
-                className="flex flex-col justify-between pt-5 border-t border-[var(--border-default)]"
+                className="h-full flex flex-col justify-between p-4 sm:p-6 rounded-xl bg-[var(--surface-page)]/85 border border-[var(--border-default)] shadow-xs"
               >
                 <div>
                   <span
-                    className="font-display text-4xl sm:text-5xl text-[var(--color-blush-600)] leading-none select-none block -mb-3"
+                    className="font-display text-3xl sm:text-4xl text-[var(--color-blush-600)] leading-none select-none block -mb-2"
                     aria-hidden="true"
                   >
                     “
                   </span>
-                  <blockquote className="font-display italic text-base sm:text-xl text-[var(--text-primary)] leading-snug font-normal">
+                  <blockquote className="font-display italic text-base sm:text-lg text-[var(--text-primary)] leading-snug font-normal">
                     {item.quote}
                   </blockquote>
                 </div>
 
-                <div className="mt-5 flex items-center gap-3">
-                  {/* Mini-Avatar WebP (128x128) ou Avatar Provisório com Tag Central TROCAR */}
-                  <div
-                    className={`relative overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] shadow-xs shrink-0 ${
-                      item.trocarLabel
-                        ? 'w-20 h-20 sm:w-24 sm:h-24'
-                        : 'w-12 h-12 sm:w-14 sm:h-14'
-                    }`}
-                  >
+                <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] flex items-center gap-3">
+                  {/* Padronização estrita 1:1 — mesma dimensão w-14 h-14 sm:w-16 sm:h-16 para todos os 6 retratos */}
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] shadow-xs shrink-0">
                     <img
                       src={item.avatar}
                       alt={`Retrato de ${item.name} (${item.handle})`}
@@ -64,14 +58,14 @@ export const Sec05ProvaSocial: React.FC = () => {
                     {item.trocarLabel && <TrocarBadge label={item.trocarLabel} compact />}
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="font-sans-editorial text-xs sm:text-sm font-semibold text-[var(--text-primary)] truncate">
                       {item.name}
                     </p>
-                    <p className="text-[0.75rem] text-[var(--action-primary)] font-medium truncate">
+                    <p className="text-[0.72rem] sm:text-xs text-[var(--action-primary)] font-medium truncate">
                       {item.handle}
                     </p>
-                    <p className="text-[0.75rem] text-[var(--text-secondary)] truncate">
+                    <p className="text-[0.7rem] sm:text-xs text-[var(--text-secondary)] truncate">
                       {item.context}
                     </p>
                   </div>
