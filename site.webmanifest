@@ -1,0 +1,19 @@
+{
+  "name": "Irondina Mascarenhas — Beauty Artist",
+  "short_name": "IRO Beauty",
+  "description": "Maquiagem clean e social, penteados completos, ensaios fotográficos e noivas em Goiânia–GO.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAF8F5",
+  "theme_color": "#FAF8F5",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

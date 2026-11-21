@@ -1,0 +1,24 @@
+# robots.txt — Irondina Mascarenhas — Beauty Artist (lp-irondina)
+User-agent: *
+Allow: /
+
+# Motores de Busca e Agentes de Citação em Tempo Real
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://irondina.semprenamoda.com.br/sitemap.xml
