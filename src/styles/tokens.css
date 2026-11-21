@@ -170,36 +170,39 @@
 }
 
 /* ==========================================================================
-   BASE EDITORIAL, CALIBRAÇÃO TIPOGRÁFICA (IMPECCABLE TYPESET) & MOTION
+   BASE EDITORIAL, CALIBRAÇÃO TIPOGRÁFICA & MOTION (em @layer base para nunca
+   sobrescrever utilidades Tailwind v4 como truncate / whitespace-nowrap)
    ========================================================================== */
-html {
-  scroll-behavior: smooth;
-  background-color: var(--surface-page);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  overflow-x: clip;
-  max-width: 100%;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    max-width: 100%;
+  }
 
-body {
-  margin: 0;
-  background-color: var(--surface-page);
-  color: var(--text-primary);
-  line-height: var(--leading-body);
-  overflow-x: clip;
-  max-width: 100%;
-}
+  body {
+    margin: 0;
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    line-height: var(--leading-body);
+    overflow-x: clip;
+    max-width: 100%;
+  }
 
-h1, h2, h3, h4 {
-  text-wrap: balance;
-}
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
 
-p, dd, li, blockquote {
-  text-wrap: pretty;
+  p, dd, li, blockquote {
+    text-wrap: pretty;
+  }
 }
 
 ::selection {
@@ -303,7 +306,143 @@ details.editorial-faq > summary::-webkit-details-marker {
   display: none;
 }
 
+/* ==========================================================================
+   CTA DA HERO -> BOTÃO FLUTUANTE WHATSAPP (MORPH CONTÍNUO NO SCROLL)
+   Referência: mendes-fotografia
+   ========================================================================== */
+.hero-cta-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-cta-slot.is-reserved {
+  width: var(--hero-cta-slot-width, auto);
+  height: var(--hero-cta-slot-height, auto);
+  flex: 0 0 auto;
+}
+
+.hero-whatsapp-cta {
+  position: relative;
+}
+
+.hero-whatsapp-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  fill: currentColor;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.72);
+  pointer-events: none;
+}
+
+.hero-whatsapp-text {
+  white-space: nowrap;
+}
+
+.hero-whatsapp-cta.is-morphing {
+  position: fixed;
+  right: calc(1.5rem + env(safe-area-inset-right));
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  width: var(--morph-width, 58px);
+  height: var(--morph-height, 58px);
+  min-height: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden;
+  border-radius: 9999px;
+  z-index: var(--z-floating-cta);
+  background-color: var(--color-whatsapp-500);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 30px rgba(23, 107, 58, 0.42);
+  transform: translate3d(var(--morph-x, 0px), var(--morph-y, 0px), 0);
+  will-change: transform, width, height;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.hero-whatsapp-cta.is-morphing .hero-whatsapp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  overflow: clip;
+  opacity: var(--morph-text-opacity, 0);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-whatsapp-cta.is-morphing .hero-whatsapp-icon {
+  width: 28px;
+  height: 28px;
+  opacity: var(--morph-icon-opacity, 1);
+  transform: translate(-50%, -50%) scale(var(--morph-icon-scale, 1));
+}
+
+.hero-whatsapp-cta.is-docked {
+  box-shadow: 0 14px 32px rgba(21, 16, 14, 0.34);
+}
+
+.hero-whatsapp-cta.is-hidden-at-bottom {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@media (hover: hover) and (min-width: 769px) {
+  .hero-whatsapp-cta.is-docked:hover {
+    background-color: #12562E;
+    color: #FFFFFF;
+    transform: translate3d(
+      var(--morph-x, 0px),
+      calc(var(--morph-y, 0px) - 3px),
+      0
+    );
+  }
+
+  .hero-whatsapp-cta.is-docked:hover .hero-whatsapp-icon {
+    transform: translate(-50%, -50%) scale(var(--morph-icon-scale, 1)) scale(1.08);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-whatsapp-cta.is-morphing {
+    right: calc(1.1rem + env(safe-area-inset-right));
+    bottom: calc(1.1rem + env(safe-area-inset-bottom));
+    width: var(--morph-width, 56px);
+    height: var(--morph-height, 56px);
+  }
+
+  .hero-whatsapp-cta.is-morphing .hero-whatsapp-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Shimmer discreto para estímulo tátil nas tags do carrossel */
+@keyframes tagPulseRing {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(109, 63, 40, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(109, 63, 40, 0.08);
+  }
+}
+
+.animate-tag-hint {
+  animation: tagPulseRing 2.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .hero-whatsapp-cta.is-morphing,
+  .hero-whatsapp-cta.is-docked,
+  .hero-whatsapp-cta.is-morphing .hero-whatsapp-icon,
+  .hero-whatsapp-cta.is-docked .hero-whatsapp-icon {
+    transition: none;
+  }
   html {
     scroll-behavior: auto;
   }

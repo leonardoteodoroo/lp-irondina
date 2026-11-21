@@ -105,21 +105,31 @@ export const Sec02Galeria: React.FC = () => {
 
   const goToPage = useCallback(
     (nextIndex: number) => {
-      if (totalPages > 1) {
-        const normalized = ((nextIndex % totalPages) + totalPages) % totalPages;
+      if (nextIndex >= 0 && nextIndex < totalPages) {
         setDirection(nextIndex >= safePageIndex ? 1 : -1);
-        setCurrentPage(normalized);
+        setCurrentPage(nextIndex);
         return;
       }
-      // Quando a categoria tem 1 página única (ex: Noivas & Civil ou Antes & Depois),
-      // deslizar navega fluidamente entre as categorias vizinhas!
+
+      // Ao chegar ao fim ou ao início de uma categoria, avança ou recua continuamente para a próxima tag!
       const catIndex = GALLERY_CATEGORIES.indexOf(activeCategory);
-      const step = nextIndex >= safePageIndex ? 1 : -1;
-      const targetCatIndex =
-        (catIndex + step + GALLERY_CATEGORIES.length) % GALLERY_CATEGORIES.length;
-      setDirection(step);
-      setActiveCategory(GALLERY_CATEGORIES[targetCatIndex]);
-      setCurrentPage(0);
+      if (nextIndex >= totalPages) {
+        const nextCat = GALLERY_CATEGORIES[(catIndex + 1) % GALLERY_CATEGORIES.length];
+        setDirection(1);
+        setActiveCategory(nextCat);
+        setCurrentPage(0);
+        return;
+      }
+
+      const prevCat =
+        GALLERY_CATEGORIES[(catIndex - 1 + GALLERY_CATEGORIES.length) % GALLERY_CATEGORIES.length];
+      const prevCatTotalPages = Math.max(
+        1,
+        Math.ceil(GALLERY_ITEMS.filter((item) => item.category === prevCat).length / PAGE_SIZE)
+      );
+      setDirection(-1);
+      setActiveCategory(prevCat);
+      setCurrentPage(prevCatTotalPages - 1);
     },
     [totalPages, safePageIndex, activeCategory]
   );
@@ -370,46 +380,118 @@ export const Sec02Galeria: React.FC = () => {
           </div>
         </div>
 
-        {/* CARROSSEL EDITORIAL POR CATEGORIA (Seletor 2x2 colado à vitrine 2x2 — resposta visual na mesma dobra) */}
+        {/* CARROSSEL EDITORIAL POR CATEGORIA (Tags 2x2 + Paginação unificadas no topo acima das 4 fotos) */}
         <div className="mt-10 lg:mt-12" aria-label="Carrossel de produções por categoria">
-          {/* Grade 2x2 de Categorias (Sem "Todas": Social & Penteados | Ensaios / Noivas & Civil | Antes & Depois) */}
-          <div
-            role="tablist"
-            aria-label="Filtrar produções do carrossel por categoria"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3"
-          >
-            {GALLERY_CATEGORIES.map((category) => {
-              const isSelected = activeCategory === category;
-              const count = categoryCounts[category] ?? 0;
-              return (
-                <button
-                  key={category}
-                  role="tab"
-                  type="button"
-                  aria-selected={isSelected}
-                  onClick={() => handleSelectCategory(category)}
-                  className={`min-h-[48px] px-3 sm:px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 text-center ${
-                    isSelected
-                      ? 'bg-[var(--color-espresso-950)] text-[var(--color-alabaster-50)] shadow-sm'
-                      : 'bg-[var(--surface-page)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)]'
-                  }`}
-                >
-                  <span className="truncate">{category}</span>
-                  <span
-                    className={`text-[0.68rem] font-semibold tabular-nums ${
-                      isSelected ? 'text-[var(--color-blush-400)]' : 'text-[var(--text-muted)]'
+          {/* Painel Unificado Superior: 4 Categorias com animação de estímulo + Controles de Paginação */}
+          <div className="rounded-2xl bg-[var(--surface-page)]/85 border border-[var(--border-default)] p-3 sm:p-4 shadow-xs">
+            <div
+              role="tablist"
+              aria-label="Filtrar produções do carrossel por categoria"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3"
+            >
+              {GALLERY_CATEGORIES.map((category) => {
+                const isSelected = activeCategory === category;
+                const count = categoryCounts[category] ?? 0;
+                return (
+                  <motion.button
+                    key={category}
+                    role="tab"
+                    type="button"
+                    aria-selected={isSelected}
+                    onClick={() => handleSelectCategory(category)}
+                    whileHover={{ scale: 1.015 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`min-h-[44px] sm:min-h-[48px] px-2 sm:px-4 py-2 rounded-full text-[0.65rem] min-[390px]:text-xs sm:text-sm font-medium transition-colors duration-200 cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 text-center ${
+                      isSelected
+                        ? 'bg-[var(--color-espresso-950)] text-[var(--color-alabaster-50)] shadow-sm animate-tag-hint'
+                        : 'bg-[var(--surface-section)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--action-primary)] border border-[var(--border-default)]'
                     }`}
                   >
-                    ({count})
-                  </span>
+                    <span
+                      className={`hidden min-[380px]:inline-block w-1.5 h-1.5 rounded-full shrink-0 ${
+                        isSelected
+                          ? 'bg-[var(--color-blush-400)] animate-pulse'
+                          : 'bg-[var(--action-primary)]/45 animate-pulse'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <span className="whitespace-nowrap">{category}</span>
+                    <span
+                      className={`text-[0.62rem] sm:text-[0.68rem] font-semibold tabular-nums shrink-0 ${
+                        isSelected ? 'text-[var(--color-blush-400)]' : 'text-[var(--text-muted)]'
+                      }`}
+                    >
+                      ({count})
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Sub-barra acoplada imediatamente acima das 4 fotos: Página X de Y · Arraste para o lado + Setas */}
+            <div className="mt-3 pt-2.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)] tabular-nums">
+                  Página {safePageIndex + 1} de {totalPages}
+                </span>
+                <span className="text-[var(--border-default)]" aria-hidden="true">
+                  ·
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[var(--action-primary)] font-display italic text-sm">
+                  <span>Arraste para o lado</span>
+                  <MoveRight className="w-4 h-4 animate-pulse" aria-hidden="true" />
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={prevSlide}
+                  aria-label="Página ou categoria anterior do carrossel"
+                  className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full bg-[var(--surface-page)] border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--color-espresso-950)] hover:text-[var(--color-alabaster-50)] transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                 </button>
-              );
-            })}
+
+                <div className="flex items-center gap-1" role="group" aria-label="Páginas da categoria atual">
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const isCurrent = idx === safePageIndex;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => goToPage(idx)}
+                        aria-label={`Ir para página ${idx + 1} de ${totalPages}`}
+                        aria-current={isCurrent ? 'true' : undefined}
+                        className="inline-flex items-center justify-center min-w-[24px] min-h-[44px] cursor-pointer"
+                      >
+                        <span
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            isCurrent
+                              ? 'w-7 bg-[var(--color-espresso-950)]'
+                              : 'w-2 bg-[var(--color-sand-400)]/60 hover:bg-[var(--action-primary)]'
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={nextSlide}
+                  aria-label="Próxima página ou categoria do carrossel"
+                  className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full bg-[var(--surface-page)] border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--color-espresso-950)] hover:text-[var(--color-alabaster-50)] transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Palco Deslizável Contido (overflow-hidden + 4 fotos 4:5 idênticas por dobra) */}
+          {/* Palco Deslizável Contido com Altura Fixa Travada (zero movimento vertical entre páginas/categorias) */}
           <div
-            className="mt-4 sm:mt-5 relative overflow-hidden w-full touch-pan-y select-none cursor-grab active:cursor-grabbing"
+            className="mt-4 relative overflow-hidden w-full touch-pan-y select-none cursor-grab active:cursor-grabbing"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleMouseDown}
@@ -422,7 +504,7 @@ export const Sec02Galeria: React.FC = () => {
                 initial={{ opacity: 0, x: direction > 0 ? 18 : -18 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: direction > 0 ? -18 : 18 }}
-                transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                 className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 items-stretch"
               >
                 {currentItems.map((item) => (
@@ -458,11 +540,11 @@ export const Sec02Galeria: React.FC = () => {
                       </span>
                     </button>
 
-                    <div className="mt-2 flex flex-col px-0.5 h-[3.4rem] sm:h-[3.9rem] overflow-hidden">
-                      <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.12em] font-semibold text-[var(--action-primary)] truncate">
+                    <div className="mt-2 flex flex-col justify-start px-0.5 min-w-0 h-[3.85rem] sm:h-[4.25rem] overflow-hidden shrink-0">
+                      <span className="text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.10em] font-semibold text-[var(--action-primary)] truncate">
                         {item.category}
                       </span>
-                      <h3 className="mt-0.5 font-display text-sm sm:text-lg font-medium text-[var(--text-primary)] leading-snug line-clamp-2">
+                      <h3 className="mt-0.5 font-display text-[0.86rem] sm:text-base font-medium text-[var(--text-primary)] leading-[1.2] line-clamp-2">
                         {item.title}
                       </h3>
                     </div>
@@ -470,64 +552,6 @@ export const Sec02Galeria: React.FC = () => {
                 ))}
               </motion.div>
             </AnimatePresence>
-          </div>
-
-          {/* Barra de Controles do Carrossel: Indicador acima/esquerda + Setas e Pílulas sem colidir com botão flutuante */}
-          <div className="mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-[var(--border-default)]">
-            {/* Indicador de paginação + estímulo tátil de arrasto */}
-            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
-              <span className="font-medium tabular-nums">
-                Página {safePageIndex + 1} de {totalPages}
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-[var(--action-primary)] font-display italic text-sm">
-                <span>Arraste para o lado</span>
-                <MoveRight className="w-4 h-4 animate-pulse" aria-hidden="true" />
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={prevSlide}
-                aria-label="Página anterior do carrossel"
-                className="inline-flex items-center justify-center min-w-[48px] min-h-[48px] rounded-full bg-[var(--surface-page)] border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--color-espresso-950)] hover:text-[var(--color-alabaster-50)] transition-colors cursor-pointer shadow-xs"
-              >
-                <ChevronLeft className="w-5 h-5" aria-hidden="true" />
-              </button>
-
-              <div className="flex items-center gap-1.5" role="group" aria-label="Páginas do carrossel">
-                {Array.from({ length: totalPages }).map((_, idx) => {
-                  const isCurrent = idx === safePageIndex;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => goToPage(idx)}
-                      aria-label={`Ir para página ${idx + 1} de ${totalPages}`}
-                      aria-current={isCurrent ? 'true' : undefined}
-                      className="inline-flex items-center justify-center min-w-[24px] min-h-[48px] cursor-pointer"
-                    >
-                      <span
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          isCurrent
-                            ? 'w-7 bg-[var(--color-espresso-950)]'
-                            : 'w-2 bg-[var(--color-sand-400)]/60 hover:bg-[var(--action-primary)]'
-                        }`}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                onClick={nextSlide}
-                aria-label="Próxima página do carrossel"
-                className="inline-flex items-center justify-center min-w-[48px] min-h-[48px] rounded-full bg-[var(--surface-page)] border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--color-espresso-950)] hover:text-[var(--color-alabaster-50)] transition-colors cursor-pointer shadow-xs"
-              >
-                <ChevronRight className="w-5 h-5" aria-hidden="true" />
-              </button>
-            </div>
           </div>
         </div>
       </div>

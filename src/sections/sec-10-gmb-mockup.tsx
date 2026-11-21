@@ -328,6 +328,10 @@ export const Sec10GmbMockup: React.FC = () => {
                 <div className="mt-4 grid grid-cols-4 gap-2">
                   <a
                     href="#topo"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
                     className="flex flex-col items-center justify-center gap-1 min-h-[54px] p-2 rounded-xl bg-[#E8F0FE] text-[#1967D2] hover:bg-[#D2E3FC] transition-colors text-xs font-medium"
                   >
                     <Globe className="w-4 h-4" aria-hidden="true" />
@@ -399,8 +403,12 @@ export const Sec10GmbMockup: React.FC = () => {
                         <div className="flex items-start gap-2.5">
                           <MapPin className="w-4 h-4 text-[#1A73E8] mt-0.5 shrink-0" />
                           <span>
-                            <strong>Área de atendimento:</strong> Goiânia – GO (estúdio próprio) ·
-                            Viagens para ensaios em BH e SP
+                            <strong>Endereço:</strong> Av. Deputado Jamel Cecílio, 2690 — Sala 1408,
+                            Ed. Metropolitan Mall, Jardim Goiás, Goiânia – GO, 74810-100{' '}
+                            <span className="text-[#5F6368]">
+                              (Endereço ilustrativo · Próximo ao Parque Flamboyant · Atendimento para
+                              ensaios também em BH e SP)
+                            </span>
                           </span>
                         </div>
                         <div className="flex items-start gap-2.5">

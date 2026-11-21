@@ -430,43 +430,19 @@ def _load_font(candidates: list[str], size: int) -> ImageFont.FreeTypeFont | Ima
 
 
 def build_og_image(tag_map: dict[str, Path]) -> None:
-    """Gera imagem Open Graph 1200x630 Dark Luxe com retrato exclusivo da Irondina Mascarenhas (IRO-03)."""
-    base = Image.new("RGBA", (1200, 630), (21, 16, 14, 255))  # #15100E
-
-    # Retrato exclusivo da Irondina Mascarenhas (IRO-03 — pele morena iluminada + cachos)
-    with Image.open(tag_map["IRO-03"]) as src_img:
-        photo = face_aware_crop(src_img, 760, 630, mode="portrait").convert("RGBA")
-
-    # Degradê horizontal suave na borda esquerda da foto para fundir com o palco escuro
-    alpha_mask = Image.new("L", (760, 630), 255)
-    mask_px = alpha_mask.load()
-    fade_w = 240
-    for x in range(fade_w):
-        alpha_val = int(255 * ((x / fade_w) ** 1.35))
-        for y in range(630):
-            mask_px[x, y] = alpha_val
-
-    base.paste(photo, (440, 0), alpha_mask)
-
-    # Scrim adicional sutil em RGBA na metade esquerda para garantir alto contraste editorial
-    scrim = Image.new("RGBA", (1200, 630), (0, 0, 0, 0))
-    scrim_px = scrim.load()
-    for x in range(660):
-        t = 1.0 - (x / 660.0)
-        a = int(245 * (t ** 1.25))
-        for y in range(630):
-            scrim_px[x, y] = (21, 16, 14, a)
-
-    canvas = Image.alpha_composite(base, scrim).convert("RGB")
-    draw = ImageDraw.Draw(canvas)
-
+    """
+    Gera duas miniaturas Open Graph Dark Luxe com retrato exclusivo da Irondina Mascarenhas (IRO-03):
+    1) public/og-image.jpg & .webp (1200x630): texto centralizado na safe-zone (x=190) para não cortar
+       letras no preview horizontal/quadrado do WhatsApp, com o lado direito excessivo removido.
+    2) public/og-image-square.jpg & .webp (800x800): proporção 1:1 dedicada para miniaturas quadradas de mensageria.
+    """
     serif_regular = _load_font(
         [
             "/usr/share/fonts/opentype/urw-base35/P052-Roman.otf",
             "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
         ],
-        60,
+        54,
     )
     serif_brand = _load_font(
         [
@@ -474,7 +450,7 @@ def build_og_image(tag_map: dict[str, Path]) -> None:
             "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
         ],
-        46,
+        42,
     )
     serif_italic = _load_font(
         [
@@ -482,38 +458,151 @@ def build_og_image(tag_map: dict[str, Path]) -> None:
             "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-italic.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
         ],
-        28,
+        26,
     )
     sans_meta = _load_font(
         [
             "/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         ],
-        18,
+        16,
     )
 
     blush = (223, 161, 148)     # #DFA194
     alabaster = (250, 248, 245) # #FAF8F5
     sand = (212, 197, 183)      # #D4C5B7
 
-    # Bloco Tipográfico Editorial na Coluna Esquerda (x=72)
-    draw.text((72, 92), "IRO", font=serif_brand, fill=blush)
-    draw.rectangle([72, 160, 168, 162], fill=blush)
+    # ------------------------------------------------------------------
+    # 1) Versão Wide Safe-Zone (1200x630)
+    # ------------------------------------------------------------------
+    with Image.open(tag_map["IRO-03"]) as src_img:
+        src_rgb = src_img.convert("RGB")
+        sw, sh = src_rgb.size
+        # Corta ~12% do espaço vazio à direita conforme solicitado pelo usuário e enquadra mais próximo no rosto
+        trimmed = src_rgb.crop((int(sw * 0.04), 0, int(sw * 0.90), sh))
+        photo = face_aware_crop(trimmed, 730, 630, mode="portrait").convert("RGBA")
 
-    draw.text((72, 200), "Irondina", font=serif_regular, fill=alabaster)
-    draw.text((72, 266), "Mascarenhas", font=serif_regular, fill=blush)
+    base = Image.new("RGBA", (1200, 630), (21, 16, 14, 255))  # #15100E
 
-    draw.text((74, 360), "BEAUTY ARTIST · GOIÂNIA–GO", font=sans_meta, fill=sand)
+    # Degradê horizontal suave na borda esquerda da foto para fundir com a coluna de texto
+    alpha_mask = Image.new("L", (730, 630), 255)
+    mask_px = alpha_mask.load()
+    fade_w = 240
+    for x in range(fade_w):
+        alpha_val = int(255 * ((x / fade_w) ** 1.35))
+        for y in range(630):
+            mask_px[x, y] = alpha_val
 
-    draw.rectangle([72, 412, 118, 414], fill=blush)
-    draw.text((72, 436), "Make embelezadora.", font=serif_italic, fill=alabaster)
-    draw.text((72, 474), "Não transforma, realça.", font=serif_italic, fill=blush)
+    base.paste(photo, (470, 0), alpha_mask)
+
+    # Scrim RGBA à esquerda garante contraste alto mesmo sobre a área de transição
+    scrim = Image.new("RGBA", (1200, 630), (0, 0, 0, 0))
+    scrim_px = scrim.load()
+    for x in range(690):
+        t = 1.0 - (x / 690.0)
+        a = int(250 * (t ** 1.15))
+        for y in range(630):
+            scrim_px[x, y] = (21, 16, 14, a)
+
+    canvas = Image.alpha_composite(base, scrim).convert("RGB")
+    draw = ImageDraw.Draw(canvas)
+
+    # Bloco Tipográfico na Safe Zone Central-Esquerda (x=190 evita cortes nas laterais do WhatsApp)
+    tx = 190
+    draw.text((tx, 102), "IRO", font=serif_brand, fill=blush)
+    draw.rectangle([tx, 162, tx + 86, 164], fill=blush)
+
+    draw.text((tx, 198), "Irondina", font=serif_regular, fill=alabaster)
+    draw.text((tx, 258), "Mascarenhas", font=serif_regular, fill=blush)
+
+    draw.text((tx + 2, 344), "BEAUTY ARTIST · GOIÂNIA–GO", font=sans_meta, fill=sand)
+
+    draw.rectangle([tx, 392, tx + 44, 394], fill=blush)
+    draw.text((tx, 416), "Make embelezadora.", font=serif_italic, fill=alabaster)
+    draw.text((tx, 452), "Não transforma, realça.", font=serif_italic, fill=blush)
 
     og_webp = PUBLIC_DIR / "og-image.webp"
     og_jpg = PUBLIC_DIR / "og-image.jpg"
     save_webp(canvas, og_webp, quality=88)
     canvas.save(og_jpg, "JPEG", quality=88, optimize=True)
-    print(f"  [OK] og-image.jpg (1200x630) -> {og_jpg.stat().st_size / 1024:.1f} KB")
+    print(f"  [OK] og-image.jpg (1200x630 safe-zone) -> {og_jpg.stat().st_size / 1024:.1f} KB")
+
+    # ------------------------------------------------------------------
+    # 2) Versão Quadrada 1:1 para Miniaturas de WhatsApp (800x800)
+    # ------------------------------------------------------------------
+    with Image.open(tag_map["IRO-03"]) as src_img:
+        src_rgb_sq = src_img.convert("RGB")
+        sw_sq, sh_sq = src_rgb_sq.size
+        trimmed_sq = src_rgb_sq.crop((int(sw_sq * 0.05), 0, int(sw_sq * 0.95), sh_sq))
+        sq_photo = face_aware_crop(trimmed_sq, 680, 680, mode="portrait").convert("RGBA")
+
+    sq_base = Image.new("RGBA", (800, 800), (21, 16, 14, 255))
+
+    # Máscara alpha bidirecional suave nas bordas esquerda (fade horizontal) e inferior (fade vertical)
+    # para eliminar 100% de quina ou linha reta ao fundir com o palco #15100E
+    sq_alpha = Image.new("L", (680, 680), 255)
+    sq_alpha_px = sq_alpha.load()
+    fade_x = 180
+    fade_y_start = 460
+    for y in range(680):
+        ay = 1.0 if y < fade_y_start else max(0.0, 1.0 - ((y - fade_y_start) / (680 - fade_y_start)) ** 1.1)
+        for x in range(680):
+            ax = 1.0 if x >= fade_x else (x / fade_x) ** 1.35
+            sq_alpha_px[x, y] = int(255 * ax * ay)
+
+    sq_base.paste(sq_photo, (120, 0), sq_alpha)
+
+    sq_scrim = Image.new("RGBA", (800, 800), (0, 0, 0, 0))
+    sq_px = sq_scrim.load()
+    for y in range(800):
+        vy = max(0.0, (y - 380) / 300.0)
+        vy = min(1.0, vy)
+        for x in range(800):
+            hx = max(0.0, 1.0 - (x / 340.0))
+            alpha_f = min(1.0, (vy ** 1.15) * 0.97 + (hx ** 1.45) * 0.85 * (1.0 - vy * 0.6))
+            sq_px[x, y] = (21, 16, 14, int(250 * alpha_f))
+
+    sq_canvas = Image.alpha_composite(sq_base, sq_scrim).convert("RGB")
+    sq_draw = ImageDraw.Draw(sq_canvas)
+
+    sq_serif_title = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Roman.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        58,
+    )
+    sq_serif_brand = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Roman.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        40,
+    )
+    sq_serif_italic = _load_font(
+        [
+            "/usr/share/fonts/opentype/urw-base35/P052-Italic.otf",
+            "/usr/share/fonts/truetype/gfonts/alegreya/alegreya-v13-latin-italic.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        ],
+        28,
+    )
+
+    sq_draw.text((64, 58), "IRO", font=sq_serif_brand, fill=blush)
+    sq_draw.rectangle([64, 114, 144, 116], fill=blush)
+
+    sq_draw.text((64, 512), "Irondina Mascarenhas", font=sq_serif_title, fill=alabaster)
+    sq_draw.text((66, 588), "BEAUTY ARTIST · GOIÂNIA–GO", font=sans_meta, fill=sand)
+    sq_draw.rectangle([64, 630, 112, 632], fill=blush)
+    sq_draw.text((64, 654), "Make embelezadora. Não transforma, realça.", font=sq_serif_italic, fill=blush)
+
+    og_sq_webp = PUBLIC_DIR / "og-image-square.webp"
+    og_sq_jpg = PUBLIC_DIR / "og-image-square.jpg"
+    save_webp(sq_canvas, og_sq_webp, quality=88)
+    sq_canvas.save(og_sq_jpg, "JPEG", quality=88, optimize=True)
+    print(f"  [OK] og-image-square.jpg (800x800 1:1) -> {og_sq_jpg.stat().st_size / 1024:.1f} KB")
 
 
 def main() -> None:

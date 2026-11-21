@@ -25,11 +25,11 @@ export const Sec05ProvaSocial: React.FC = () => {
 
         {/* Faixa A — Grade 2x3 Proporcional Padronizada (Todos os avatares exatamente do mesmo tamanho) */}
         <div className="mt-8 cq-grid">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 items-stretch">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 items-stretch">
             {TESTIMONIALS_LIST.map((item) => (
               <article
                 key={item.id}
-                className="h-full flex flex-col justify-between p-4 sm:p-6 rounded-xl bg-[var(--surface-page)]/85 border border-[var(--border-default)] shadow-xs"
+                className="h-full min-w-0 flex flex-col justify-between p-3 sm:p-6 rounded-xl bg-[var(--surface-page)]/85 border border-[var(--border-default)] shadow-xs"
               >
                 <div>
                   <span
@@ -38,14 +38,14 @@ export const Sec05ProvaSocial: React.FC = () => {
                   >
                     “
                   </span>
-                  <blockquote className="font-display italic text-base sm:text-lg text-[var(--text-primary)] leading-snug font-normal">
+                  <blockquote className="font-display italic text-[0.95rem] sm:text-lg text-[var(--text-primary)] leading-snug font-normal">
                     {item.quote}
                   </blockquote>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] flex items-center gap-3">
-                  {/* Padronização estrita 1:1 — mesma dimensão w-14 h-14 sm:w-16 sm:h-16 para todos os 6 retratos */}
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] shadow-xs shrink-0">
+                <div className="mt-4 pt-3.5 border-t border-[var(--border-subtle)] flex items-center gap-2 sm:gap-3 h-[4.85rem] sm:h-[5.5rem] shrink-0 overflow-hidden">
+                  {/* Padronização estrita 1:1 — mesma dimensão e mesma altura vertical de linha divisória em todos os cards */}
+                  <div className="relative w-11 h-11 sm:w-16 sm:h-16 overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] shadow-xs shrink-0">
                     <img
                       src={item.avatar}
                       alt={`Retrato de ${item.name} (${item.handle})`}
@@ -58,14 +58,14 @@ export const Sec05ProvaSocial: React.FC = () => {
                     {item.trocarLabel && <TrocarBadge label={item.trocarLabel} compact />}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="font-sans-editorial text-xs sm:text-sm font-semibold text-[var(--text-primary)] truncate">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <p className="font-sans-editorial text-[0.72rem] sm:text-sm font-semibold text-[var(--text-primary)] truncate">
                       {item.name}
                     </p>
-                    <p className="text-[0.72rem] sm:text-xs text-[var(--action-primary)] font-medium truncate">
+                    <p className="text-[0.65rem] sm:text-xs text-[var(--action-primary)] font-medium truncate">
                       {item.handle}
                     </p>
-                    <p className="text-[0.7rem] sm:text-xs text-[var(--text-secondary)] truncate">
+                    <p className="text-[0.62rem] sm:text-xs text-[var(--text-secondary)] truncate">
                       {item.context}
                     </p>
                   </div>
