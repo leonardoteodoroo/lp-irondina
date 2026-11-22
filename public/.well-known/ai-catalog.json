@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "identifier": "urn:air:irondina.semprenamoda.com.br:site:llms-context",
+      "displayName": "Irondina Mascarenhas — Beauty Artist",
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "url": "https://irondina.semprenamoda.com.br/llms-full.txt",
+      "representativeQueries": [
+        "Irondina Mascarenhas maquiadora e penteadista em Goiânia",
+        "Consultar disponibilidade maquiagem clean e penteado no WhatsApp",
+        "Maquiagem para ensaios fotográficos e noivas Goiânia BH SP"
+      ]
+    }
+  ]
+}

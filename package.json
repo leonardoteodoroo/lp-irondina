@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview --port 4173 --host",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist -t"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.1.0",
