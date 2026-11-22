@@ -1,10 +1,44 @@
-import React, { useRef } from 'react';
-import { ArrowUp, ArrowUpRight, X } from 'lucide-react';
-import { INSTAGRAM_URL, WHATSAPP_DISPLAY } from '../data/content';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowUp, ArrowUpRight, MessageCircle, X } from 'lucide-react';
+import { INSTAGRAM_URL, WHATSAPP_DISPLAY, buildWhatsAppUrl } from '../data/content';
+
+const FLOATING_WHATSAPP_MSG =
+  'Olá, Irondina! Vi seu site e gostaria de consultar disponibilidade de data para atendimento.';
 
 export const Sec09Footer: React.FC = () => {
   const lgpdDialogRef = useRef<HTMLDialogElement>(null);
   const creditsDialogRef = useRef<HTMLDialogElement>(null);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  // Oculta o botão flutuante na Hero, CTA Concierge, Footer e Mockup GMB
+  useEffect(() => {
+    const targets = [
+      document.getElementById('hero'),
+      document.getElementById('agendar'),
+      document.querySelector('footer'),
+      document.getElementById('google-meu-negocio-preview'),
+    ].filter((el): el is HTMLElement => el !== null);
+
+    if (targets.length === 0) return;
+
+    const visibleMap = new Map<Element, boolean>();
+    const heroEl = document.getElementById('hero');
+    if (heroEl) visibleMap.set(heroEl, true);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          visibleMap.set(entry.target, entry.isIntersecting);
+        }
+        const hideFloating = Array.from(visibleMap.values()).some(Boolean);
+        setShowFloatingCta(!hideFloating);
+      },
+      { threshold: 0.08 }
+    );
+
+    for (const el of targets) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleScrollTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -235,6 +269,31 @@ export const Sec09Footer: React.FC = () => {
           </div>
         </div>
       </dialog>
+
+      {/* Botão Flutuante Discreto de WhatsApp (Oculto na Hero, CTA Concierge, Footer e Mockup GMB) */}
+      <div
+        className={`fixed bottom-5 right-5 z-[var(--z-floating-cta)] transition-all duration-300 ${
+          showFloatingCta
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 translate-y-3 pointer-events-none'
+        }`}
+      >
+        <a
+          href={buildWhatsAppUrl(FLOATING_WHATSAPP_MSG)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Consultar data pelo WhatsApp"
+          tabIndex={showFloatingCta ? 0 : -1}
+          className="inline-flex items-center gap-2.5 min-h-[48px] px-4 py-3 rounded-full bg-[var(--color-espresso-950)] hover:bg-[var(--action-primary)] text-[var(--color-alabaster-50)] shadow-[var(--shadow-floating)] border border-[var(--color-stone-300)]/30 text-xs sm:text-sm font-medium transition-colors"
+        >
+          <span
+            className="w-2.5 h-2.5 rounded-full bg-[var(--action-whatsapp-icon)] shrink-0"
+            aria-hidden="true"
+          />
+          <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+          <span>Consultar data</span>
+        </a>
+      </div>
     </>
   );
 };
