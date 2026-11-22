@@ -20,6 +20,7 @@ import {
   buildWhatsAppUrl,
 } from '../data/content';
 import { TrocarBadge } from '../components/TrocarBadge';
+import { LazyAutoplayVideo } from '../components/LazyAutoplayVideo';
 
 const LIGHTBOX_WHATSAPP_MSG =
   'Olá, Irondina! Gostei dessa produção do seu portfólio e gostaria de verificar disponibilidade para um atendimento parecido.';
@@ -273,10 +274,12 @@ export const Sec02Galeria: React.FC = () => {
                 {/* Foto Antes (IG-04) */}
                 <figure className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[3/4] bg-[#15100E]">
                   <img
-                    src={MEDIA.beforeAfter.before}
+                    src={MEDIA.beforeAfter.beforeSm}
+                    srcSet={`${MEDIA.beforeAfter.beforeSm} 420w, ${MEDIA.beforeAfter.before} 720w`}
+                    sizes="(max-width: 1023px) 44vw, 28vw"
                     alt="Sem maquiagem (Antes) — Pele natural de Berta Leite antes do atendimento"
-                    width={750}
-                    height={1000}
+                    width={420}
+                    height={560}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover"
@@ -289,10 +292,12 @@ export const Sec02Galeria: React.FC = () => {
                 {/* Foto Depois (Crossfade Automático Suave na GPU entre IG-06 e IG-05) */}
                 <figure className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[3/4] bg-[#15100E]">
                   <img
-                    src={MEDIA.beforeAfter.afterOpen}
+                    src={MEDIA.beforeAfter.afterOpenSm}
+                    srcSet={`${MEDIA.beforeAfter.afterOpenSm} 420w, ${MEDIA.beforeAfter.afterOpen} 720w`}
+                    sizes="(max-width: 1023px) 44vw, 28vw"
                     alt="Pele finalizada (Depois — Olhos abertos) — Maquiagem clean iluminada por Irondina Mascarenhas"
-                    width={750}
-                    height={1000}
+                    width={420}
+                    height={560}
                     loading="lazy"
                     decoding="async"
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-900 ease-in-out ${
@@ -300,10 +305,12 @@ export const Sec02Galeria: React.FC = () => {
                     }`}
                   />
                   <img
-                    src={MEDIA.beforeAfter.afterClosed}
+                    src={MEDIA.beforeAfter.afterClosedSm}
+                    srcSet={`${MEDIA.beforeAfter.afterClosedSm} 420w, ${MEDIA.beforeAfter.afterClosed} 720w`}
+                    sizes="(max-width: 1023px) 44vw, 28vw"
                     alt="Pele finalizada (Depois — Detalhe da pálpebra e textura real) por Irondina Mascarenhas"
-                    width={750}
-                    height={1000}
+                    width={420}
+                    height={560}
                     loading="lazy"
                     decoding="async"
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-900 ease-in-out ${
@@ -352,20 +359,15 @@ export const Sec02Galeria: React.FC = () => {
               </div>
 
               <div className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[4/5] bg-[#15100E]">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
+                <LazyAutoplayVideo
+                  webmSrc={MEDIA.videoMvp.webm}
+                  mp4Src={MEDIA.videoMvp.mp4}
                   poster={MEDIA.videoMvp.poster}
-                  width={560}
-                  height={700}
-                  aria-label="Montagem acelerada com produções reais finalizadas em luz de estúdio por Irondina Mascarenhas"
+                  width={480}
+                  height={600}
+                  ariaLabel="Montagem acelerada com produções reais finalizadas em luz de estúdio por Irondina Mascarenhas"
                   className="w-full h-full object-cover"
-                >
-                  <source src={MEDIA.videoMvp.webm} type="video/webm" />
-                  <source src={MEDIA.videoMvp.mp4} type="video/mp4" />
-                </video>
+                />
 
                 <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-[var(--radius-media)] bg-[#15100E]/82 backdrop-blur-xs text-[0.68rem] font-medium text-[var(--color-alabaster-50)] border border-[var(--border-on-dark)]">
                   5 produções reais em movimento · Goiânia–GO
@@ -515,10 +517,16 @@ export const Sec02Galeria: React.FC = () => {
                       className="relative w-full overflow-hidden rounded-[var(--radius-media)] bg-[var(--surface-editorial-band)] aspect-[4/5] cursor-pointer text-left shadow-xs focus-visible:outline-2 focus-visible:outline-[var(--border-focus)]"
                     >
                       <img
-                        src={item.src}
+                        src={item.srcSm ?? item.src}
+                        srcSet={
+                          item.srcSm
+                            ? `${item.srcSm} ${item.smWidth ?? 400}w, ${item.src} ${item.width}w`
+                            : undefined
+                        }
+                        sizes="(max-width: 639px) 46vw, (max-width: 1023px) 44vw, 24vw"
                         alt={`Ampliar produção: ${item.title} — ${item.description}`}
-                        width={720}
-                        height={900}
+                        width={400}
+                        height={500}
                         loading="lazy"
                         decoding="async"
                         draggable={false}

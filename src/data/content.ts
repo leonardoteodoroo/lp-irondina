@@ -8,32 +8,58 @@ import heroStageIg01 from '../assets/media/hero-stage-ig01.webp';
 import heroStageIg01Sm from '../assets/media/hero-stage-ig01-sm.webp';
 
 import ig01 from '../assets/media/ig-01.webp';
+import ig01Sm from '../assets/media/ig-01-sm.webp';
 import ig03 from '../assets/media/ig-03.webp';
+import ig03Sm from '../assets/media/ig-03-sm.webp';
 import ig04Antes from '../assets/media/ig-04-antes.webp';
+import ig04AntesSm from '../assets/media/ig-04-antes-sm.webp';
 import ig05DepoisOlhos from '../assets/media/ig-05-depois-olhos.webp';
+import ig05DepoisOlhosSm from '../assets/media/ig-05-depois-olhos-sm.webp';
 import ig06Depois from '../assets/media/ig-06-depois.webp';
+import ig06DepoisSm from '../assets/media/ig-06-depois-sm.webp';
 import ig09 from '../assets/media/ig-09.webp';
+import ig09Sm from '../assets/media/ig-09-sm.webp';
 import ig10 from '../assets/media/ig-10.webp';
+import ig10Sm from '../assets/media/ig-10-sm.webp';
 import ig11 from '../assets/media/ig-11.webp';
+import ig11Sm from '../assets/media/ig-11-sm.webp';
 import ig12 from '../assets/media/ig-12.webp';
+import ig12Sm from '../assets/media/ig-12-sm.webp';
 import ig13 from '../assets/media/ig-13.webp';
+import ig13Sm from '../assets/media/ig-13-sm.webp';
 import ig16 from '../assets/media/ig-16.webp';
+import ig16Sm from '../assets/media/ig-16-sm.webp';
 import ig18 from '../assets/media/ig-18.webp';
+import ig18Sm from '../assets/media/ig-18-sm.webp';
 import ig19 from '../assets/media/ig-19.webp';
+import ig19Sm from '../assets/media/ig-19-sm.webp';
 import ig20 from '../assets/media/ig-20.webp';
+import ig20Sm from '../assets/media/ig-20-sm.webp';
 import ig24 from '../assets/media/ig-24.webp';
+import ig24Sm from '../assets/media/ig-24-sm.webp';
 import ig28 from '../assets/media/ig-28.webp';
+import ig28Sm from '../assets/media/ig-28-sm.webp';
 import ig30 from '../assets/media/ig-30.webp';
+import ig30Sm from '../assets/media/ig-30-sm.webp';
 import ig31 from '../assets/media/ig-31.webp';
+import ig31Sm from '../assets/media/ig-31-sm.webp';
 import ig32 from '../assets/media/ig-32.webp';
+import ig32Sm from '../assets/media/ig-32-sm.webp';
 import ig33 from '../assets/media/ig-33.webp';
+import ig33Sm from '../assets/media/ig-33-sm.webp';
 import ig37 from '../assets/media/ig-37.webp';
+import ig37Sm from '../assets/media/ig-37-sm.webp';
 import ig38 from '../assets/media/ig-38.webp';
+import ig38Sm from '../assets/media/ig-38-sm.webp';
 import ig41Curso from '../assets/media/ig-41-curso.webp';
 import ig44 from '../assets/media/ig-44.webp';
+import ig44Sm from '../assets/media/ig-44-sm.webp';
 import ig49 from '../assets/media/ig-49.webp';
+import ig49Sm from '../assets/media/ig-49-sm.webp';
 import ig59 from '../assets/media/ig-59.webp';
+import ig59Sm from '../assets/media/ig-59-sm.webp';
 import ig66 from '../assets/media/ig-66.webp';
+import ig66Sm from '../assets/media/ig-66-sm.webp';
 
 import iro03 from '../assets/media/iro-03.webp';
 import iro06 from '../assets/media/iro-06.webp';
@@ -45,7 +71,9 @@ import avatarJuliaIg09 from '../assets/media/avatar-julia-ig09.webp';
 import avatarRenataIg31 from '../assets/media/avatar-renata-ig31.webp';
 
 import placeholderPenteadoCostas from '../assets/media/placeholder-penteado-costas.webp';
+import placeholderPenteadoCostasSm from '../assets/media/placeholder-penteado-costas-sm.webp';
 import placeholderNoivaCartorio from '../assets/media/placeholder-noiva-cartorio.webp';
+import placeholderNoivaCartorioSm from '../assets/media/placeholder-noiva-cartorio-sm.webp';
 import placeholderCursoAutomaquiagem from '../assets/media/placeholder-curso-automaquiagem.webp';
 import placeholderAvatarFabiane from '../assets/media/placeholder-avatar-fabiane.webp';
 
@@ -84,8 +112,11 @@ export const MEDIA = {
   },
   beforeAfter: {
     before: ig04Antes,
+    beforeSm: ig04AntesSm,
     afterOpen: ig06Depois,
+    afterOpenSm: ig06DepoisSm,
     afterClosed: ig05DepoisOlhos,
+    afterClosedSm: ig05DepoisOlhosSm,
     clientName: 'Berta Leite (@leiteberta)',
     description:
       'Pele iluminada em camadas finas com textura real preservada, blush rosado luminoso, delineado fino e preenchimento suave respeitando o tom ruivo natural.',
@@ -121,6 +152,8 @@ export interface GalleryItem {
   description: string;
   credit?: string;
   src: string;
+  srcSm?: string;
+  smWidth?: number;
   width: number;
   height: number;
   aspectClass: 'aspect-[4/5]' | 'aspect-[3/4]' | 'aspect-square';
@@ -145,6 +178,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Produção integrada de maquiagem iluminada e penteado semipreso polido com ondas definidas para evento social.',
     credit: 'Cliente: @juliafrohllich_',
     src: ig09,
+    srcSm: ig09Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -158,6 +192,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Esfumado marrom quente suave, delineado fino e pele translúcida de longa duração sem pesar.',
     credit: 'Cliente: @nanda_rsoares',
     src: ig10,
+    srcSm: ig10Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -170,6 +205,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Pele iluminada em camadas leves e colorimetria que respeita o subtom natural, sem acinzentar.',
     src: ig20,
+    srcSm: ig20Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -182,6 +218,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Penteado preso em coque elegante combinado a acabamento acetinado e batom nude caramelo.',
     src: ig59,
+    srcSm: ig59Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -194,6 +231,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Acabamento técnico de estrutura, fixação limpa de grampos e polimento de mechas visto de costas.',
     src: placeholderPenteadoCostas,
+    srcSm: placeholderPenteadoCostasSm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -208,6 +246,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Pele corrigida com leveza, contorno suave e lábios nude rosados para eventos noturnos.',
     credit: 'Collab: @rafaeellalopez',
     src: ig12,
+    srcSm: ig12Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -220,6 +259,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Pálpebra clara acetinada, delineado gráfico fino e pele uniforme sob luz natural.',
     src: ig16,
+    srcSm: ig16Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -232,6 +272,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Cobertura leve que preserva sardas naturais com pálpebra champagne e ondas douradas.',
     src: ig19,
+    srcSm: ig19Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -244,6 +285,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Luminosidade controlada na pele e pálpebra rosê-champagne para festas e formaturas.',
     src: ig24,
+    srcSm: ig24Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -256,6 +298,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Penteado preso meio alto com ondas soltas e maquiagem em tons quentes bronze.',
     src: ig49,
+    srcSm: ig49Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -268,6 +311,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Pele negra clara uniforme com rabo de cavalo alto polido e esfumado marrom clássico.',
     src: ig66,
+    srcSm: ig66Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -280,6 +324,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Acabamento clássico de evento social com pele aveludada e ondas definidas.',
     src: ig28,
+    srcSm: ig28Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -295,6 +340,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Pele negra iluminada pensada para flash de estúdio e edição fotográfica, sem estourar.',
     credit: 'Foto: @darahcoelho · Hair: @luiza_trancistx · Cliente: @fer.nandaugc',
     src: ig01,
+    srcSm: ig01Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -308,6 +354,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Acabamento glow quente e contorno labial equilibrado sob iluminação contínua de estúdio.',
     credit: 'Foto: @darahcoelho · Hair: @luiza_trancistx · Cliente: @fer.nandaugc',
     src: ig03,
+    srcSm: ig03Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -321,6 +368,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Beleza executiva limpa em tons neutros que transmite autoridade sem competir com o retrato.',
     credit: 'Foto: @cristiannecostafotografia · Cliente: @lourrainy_depaula',
     src: ig13,
+    srcSm: ig13Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -334,6 +382,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Sombra rosê-cobre cintilante suave e pele luminosa quente para posicionamento profissional.',
     credit: 'Cliente: @bypolianasouza',
     src: ig32,
+    srcSm: ig32Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -347,6 +396,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Pele natural equilibrada com esfumado clássico suave e lábios vermelhos de alta precisão.',
     credit: 'Cliente: @saralidiamorais',
     src: ig38,
+    srcSm: ig38Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -360,6 +410,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Harmonia entre luz de estúdio, textura de pele real e acabamento clean durável.',
     credit: 'Cliente: @bypolianasouza',
     src: ig33,
+    srcSm: ig33Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -372,6 +423,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Sombra champagne luminosa e lábios terracota acetinados alinhados ao figurino.',
     src: ig37,
+    srcSm: ig37Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -384,6 +436,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Maquiagem neutra atemporal e ondas soltas para fotos de perfil e comunicação profissional.',
     src: ig44,
+    srcSm: ig44Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -399,6 +452,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Beleza delicada em tons rosê iluminados com trança embutida lateral pensada para luz diurna.',
     credit: 'Noiva: @renatadfelipe',
     src: ig30,
+    srcSm: ig30Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -412,6 +466,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Acabamento à prova de emoção e abraços, mantendo a identidade natural da noiva nas fotos.',
     credit: 'Noiva: @renatadfelipe',
     src: ig31,
+    srcSm: ig31Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -425,6 +480,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Produção completa de maquiagem e penteado para cerimônia civil e registros externos.',
     credit: 'Parceria fotográfica: @jhonata_brito',
     src: placeholderNoivaCartorio,
+    srcSm: placeholderNoivaCartorioSm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -438,6 +494,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     description:
       'Pálpebra pêssego/champagne suave, delineado fino e pele leve para madrinhas e cerimônias diurnas.',
     src: ig18,
+    srcSm: ig18Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -453,6 +510,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Registro prévio sem maquiagem evidenciando o ponto de partida real para construção de camadas leves.',
     credit: 'Cliente: @leiteberta',
     src: ig04Antes,
+    srcSm: ig04AntesSm,
+    smWidth: 420,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -466,6 +525,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Acabamento leve e viçoso que realça traços e preserva a naturalidade diante do painel oficial do estúdio.',
     credit: 'Cliente: @leiteberta',
     src: ig06Depois,
+    srcSm: ig06DepoisSm,
+    smWidth: 420,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -479,6 +540,8 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Sombra champagne suave, delineado fino e preenchimento de sobrancelha respeitando o subtom ruivo.',
     credit: 'Cliente: @leiteberta',
     src: ig05DepoisOlhos,
+    srcSm: ig05DepoisOlhosSm,
+    smWidth: 420,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',
@@ -492,6 +555,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       'Sorriso espontâneo evidenciando luminosidade equilibrada sem acúmulo em linhas de expressão.',
     credit: 'Cliente: @nanda_rsoares',
     src: ig11,
+    srcSm: ig11Sm,
     width: 720,
     height: 900,
     aspectClass: 'aspect-[4/5]',

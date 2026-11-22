@@ -1,37 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
 import { ArrowDown, MessageCircle } from 'lucide-react';
-import { MEDIA, buildWhatsAppUrl } from '../data/content';
+import { HERO_PRIMARY_SCENE, buildWhatsAppUrl } from '../data/hero-media';
 
 const HERO_WHATSAPP_MSG =
   'Olá, Irondina! Vi seu portfólio no site e gostaria de consultar disponibilidade de data para atendimento.';
 
-const HERO_SCENES = [
-  {
-    id: 'scene-01',
-    src: MEDIA.hero.stagePrimary,
-    srcSm: MEDIA.hero.stagePrimarySm,
-    alt: 'Retrato editorial de beleza e posicionamento por Irondina Mascarenhas em Goiânia',
-    caption: 'Pele Iluminada & Cachos 3D · Estúdio Goiânia',
-    objectPos: 'object-[center_top] lg:object-[72%_20%]',
-  },
-  {
-    id: 'scene-02',
-    src: MEDIA.hero.stageSecondary,
-    srcSm: MEDIA.hero.mainSm,
-    alt: 'Produção de maquiagem clean iluminada por Irondina Mascarenhas no estúdio próprio',
-    caption: 'Textura Real & Viço Leve · Painel Oficial IRO',
-    objectPos: 'object-[center_top] lg:object-[75%_22%]',
-  },
-  {
-    id: 'scene-03',
-    src: MEDIA.hero.stageTertiary,
-    srcSm: MEDIA.hero.stageTertiarySm,
-    alt: 'Produção completa de maquiagem glow e penteado preso alto estilizado',
-    caption: 'Make & Penteado Integrados · Luz de Estúdio',
-    objectPos: 'object-[center_top] lg:object-[74%_18%]',
-  },
-];
+interface HeroSceneItem {
+  id: string;
+  src: string;
+  srcSm: string;
+  alt: string;
+  caption: string;
+  objectPos: string;
+}
+
+const HERO_CAPTIONS = [
+  HERO_PRIMARY_SCENE.caption,
+  'Textura Real & Viço Leve · Painel Oficial IRO',
+  'Make & Penteado Integrados · Luz de Estúdio',
+] as const;
 
 const CREDENTIALS = [
   {
@@ -59,11 +46,54 @@ const CREDENTIALS = [
 
 export const Sec01Hero: React.FC = () => {
   const [activeScene, setActiveScene] = useState(0);
+  const [scenes, setScenes] = useState<HeroSceneItem[]>([HERO_PRIMARY_SCENE]);
 
-  // Troca cinematográfica automática suave das fotos de fundo da Hero (sem exigir clique)
+  // Carrega Cenas 2 e 3 dinamicamente só após a Hero LCP já estar pintada (0 KiB extras em t=0)
+  useEffect(() => {
+    let cancelled = false;
+    const prefetchTimer = window.setTimeout(async () => {
+      try {
+        const [s2Lg, s2Sm, s3Lg, s3Sm] = await Promise.all([
+          import('../assets/media/hero-ig-06.webp'),
+          import('../assets/media/hero-ig-06-sm.webp'),
+          import('../assets/media/hero-stage-ig01.webp'),
+          import('../assets/media/hero-stage-ig01-sm.webp'),
+        ]);
+        if (cancelled) return;
+        setScenes([
+          HERO_PRIMARY_SCENE,
+          {
+            id: 'scene-02',
+            src: s2Lg.default,
+            srcSm: s2Sm.default,
+            alt: 'Produção de maquiagem clean iluminada por Irondina Mascarenhas no estúdio próprio',
+            caption: HERO_CAPTIONS[1],
+            objectPos: 'object-[center_top] lg:object-[75%_22%]',
+          },
+          {
+            id: 'scene-03',
+            src: s3Lg.default,
+            srcSm: s3Sm.default,
+            alt: 'Produção completa de maquiagem glow e penteado preso alto estilizado',
+            caption: HERO_CAPTIONS[2],
+            objectPos: 'object-[center_top] lg:object-[74%_18%]',
+          },
+        ]);
+      } catch {
+        // Fallback silencioso: mantém Cena 1 estática
+      }
+    }, 4000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(prefetchTimer);
+    };
+  }, []);
+
+  // Alternância cinematográfica automática das cenas carregadas
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setActiveScene((prev) => (prev + 1) % HERO_SCENES.length);
+      setActiveScene((prev) => (prev + 1) % HERO_CAPTIONS.length);
     }, 4800);
     return () => window.clearInterval(timer);
   }, []);
@@ -78,17 +108,17 @@ export const Sec01Hero: React.FC = () => {
       {/* Palco Fotográfico Full-Bleed Cinematográfico (Mobile estilo Tai Vilela & Desktop estilo Stitch Variant 3) */}
       <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden">
         <div className="relative w-full h-[58%] lg:h-full overflow-hidden">
-          {HERO_SCENES.map((scene, index) => {
-            const isCurrent = index === activeScene;
+          {scenes.map((scene, index) => {
+            const isCurrent = index === activeScene % scenes.length;
             return (
               <img
                 key={scene.id}
                 src={scene.src}
-                srcSet={`${scene.srcSm} 720w, ${scene.src} 1200w`}
+                srcSet={`${scene.srcSm} 750w, ${scene.src} 960w`}
                 sizes="(max-width: 1023px) 100vw, 68vw"
                 alt={scene.alt}
-                width={1200}
-                height={1500}
+                width={750}
+                height={938}
                 fetchPriority={index === 0 ? 'high' : undefined}
                 decoding={index === 0 ? 'sync' : 'async'}
                 className={`absolute inset-0 w-full h-full lg:w-[68%] lg:ml-auto object-cover ${scene.objectPos} animate-ken-burns transition-opacity duration-1000 ease-out ${
@@ -129,12 +159,7 @@ export const Sec01Hero: React.FC = () => {
 
       {/* Conteúdo Editorial Sobreposto ao Palco Escuro (CTA 100% visível acima da dobra em 360x800) */}
       <div className="editorial-container relative z-10 flex-1 flex flex-col justify-end lg:justify-center pt-[38dvh] sm:pt-[44dvh] lg:pt-16 pb-6 lg:pb-14">
-        <motion.div
-          initial={{ opacity: 0, translateY: 16 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-[660px] flex flex-col items-start"
-        >
+        <div className="max-w-[660px] flex flex-col items-start animate-hero-enter">
           {/* Título Principal H1 — Zero Eyebrow, EB Garamond com destaque em itálico Blush (#DFA194) */}
           <h1
             id="hero-heading"
@@ -147,7 +172,7 @@ export const Sec01Hero: React.FC = () => {
             </span>
           </h1>
 
-          {/* Assinatura da Marca com Travessão Editorial Blush (Idêntico à Imagem 2) */}
+          {/* Assinatura da Marca com Travessão Editorial Blush */}
           <div className="mt-4 sm:mt-5 flex items-center gap-3.5">
             <span
               className="w-8 sm:w-10 h-[1px] bg-[var(--color-blush-400)]/80 shrink-0"
@@ -194,23 +219,23 @@ export const Sec01Hero: React.FC = () => {
             </a>
           </div>
 
-          {/* Indicador sutil de altura fixa para evitar refluxo na troca automática */}
+          {/* Indicador sutil GPU-only (scaleX em vez de width) mantendo altura fixa sem refluxo */}
           <div className="mt-7 h-5 flex items-center gap-3 text-xs text-[var(--color-sand-300)]/80 overflow-hidden w-full">
             <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
-              {HERO_SCENES.map((s, idx) => (
+              {HERO_CAPTIONS.map((cap, idx) => (
                 <span
-                  key={s.id}
-                  className={`h-1 rounded-full transition-all duration-500 ${
+                  key={cap}
+                  className={`h-1 w-6 rounded-full origin-left transition-[transform,opacity] duration-500 ${
                     idx === activeScene
-                      ? 'w-6 bg-[var(--color-blush-400)]'
-                      : 'w-1.5 bg-[var(--color-sand-300)]/35'
+                      ? 'scale-x-100 opacity-100 bg-[var(--color-blush-400)]'
+                      : 'scale-x-[0.28] opacity-35 bg-[var(--color-sand-300)]'
                   }`}
                 />
               ))}
             </div>
-            <span className="truncate">{HERO_SCENES[activeScene].caption}</span>
+            <span className="truncate">{HERO_CAPTIONS[activeScene]}</span>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Barra Horizontal Integrada de Credenciais em Dark Glass (01..04 em Blush — Idêntica à Imagem 2) */}

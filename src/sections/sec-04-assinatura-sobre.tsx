@@ -1,27 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { MEDIA } from '../data/content';
+import { LazyAutoplayVideo } from '../components/LazyAutoplayVideo';
 
 export const Sec04AssinaturaSobre: React.FC = () => {
-  const brollRef = useRef<HTMLVideoElement>(null);
-
-  // Carrega e reproduz o vídeo de bastidores apenas quando a seção entra em visibilidade (CWV otimizado)
-  useEffect(() => {
-    const videoEl = brollRef.current;
-    if (!videoEl) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          videoEl.play().catch(() => {});
-        } else {
-          videoEl.pause();
-        }
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(videoEl);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section
       id="sobre"
@@ -78,21 +59,15 @@ export const Sec04AssinaturaSobre: React.FC = () => {
               </figure>
 
               <figure className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[4/5] bg-[var(--color-espresso-950)] shadow-[var(--shadow-subtle)]">
-                <video
-                  ref={brollRef}
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
+                <LazyAutoplayVideo
+                  webmSrc={MEDIA.about.brollVideo.webm}
+                  mp4Src={MEDIA.about.brollVideo.mp4}
                   poster={MEDIA.about.brollVideo.poster}
-                  width={560}
-                  height={700}
-                  aria-label="Bastidores de bancada e finalização de produção por Irondina Mascarenhas no estúdio"
+                  width={360}
+                  height={450}
+                  ariaLabel="Bastidores de bancada e finalização de produção por Irondina Mascarenhas no estúdio"
                   className="w-full h-full object-cover"
-                >
-                  <source src={MEDIA.about.brollVideo.webm} type="video/webm" />
-                  <source src={MEDIA.about.brollVideo.mp4} type="video/mp4" />
-                </video>
+                />
                 <figcaption className="absolute bottom-0 inset-x-0 bg-[var(--color-espresso-950)]/85 px-2.5 py-1.5 text-[0.7rem] text-[var(--color-alabaster-50)] font-medium flex items-center gap-1.5">
                   <span
                     className="w-1.5 h-1.5 rounded-full bg-[var(--color-blush-400)] animate-pulse shrink-0"

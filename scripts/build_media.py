@@ -14,6 +14,7 @@ Pipeline de Mídias — Irondina Mascarenhas (lp-irondina)
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 import cv2
 import numpy as np
@@ -213,17 +214,19 @@ def _render_montage_from_segments(
     poster_out: Path,
     webm_out: Path,
     mp4_out: Path,
+    poster_size: tuple[int, int] = (480, 600),
+    images_only: bool = False,
 ) -> None:
     """
     Monta um showreel editorial sem áudio com aceleração (speed ramp) por clipe,
     transições suaves (xfade), normalização de cor e saída dupla WebM VP9 + MP4 H.264.
     segments: lista de (caminho_video, inicio_s, fim_s, fator_aceleracao, crop_y)
     """
-    for src_path, *_ in segments:
-        if not src_path.exists():
-            raise FileNotFoundError(f"Vídeo fonte não encontrado: {src_path}")
+    if not poster_src.exists():
+        raise FileNotFoundError(f"Vídeo fonte não encontrado: {poster_src}")
 
-    # 1. Extrai poster WebP limpo do frame de abertura
+    # 1. Extrai poster WebP limpo na dimensão exibida (evita sobredimensionamento no PageSpeed)
+    pw, ph = poster_size
     poster_png = OUT_MEDIA / f"_tmp_{poster_out.stem}.png"
     subprocess.run(
         [
@@ -234,7 +237,7 @@ def _render_montage_from_segments(
             "-i",
             str(poster_src),
             "-vf",
-            f"crop=720:900:0:{poster_crop_y},scale=720:900:flags=lanczos",
+            f"crop=720:900:0:{poster_crop_y},scale={pw}:{ph}:flags=lanczos",
             "-frames:v",
             "1",
             str(poster_png),
@@ -244,9 +247,17 @@ def _render_montage_from_segments(
         stderr=subprocess.DEVNULL,
     )
     with Image.open(poster_png) as p_img:
-        save_webp(p_img, poster_out, quality=84)
+        save_webp(p_img, poster_out, quality=74)
     if poster_png.exists():
         subprocess.run(["gio", "trash", str(poster_png)], check=False)
+
+    if images_only and webm_out.exists() and mp4_out.exists():
+        print(f"  [SKIP] {webm_out.name} / {mp4_out.name} (--images-only)")
+        return
+
+    for src_path, *_ in segments:
+        if not src_path.exists():
+            raise FileNotFoundError(f"Vídeo fonte não encontrado: {src_path}")
 
     # 2. Monta grafo de filtros com speed-up e xfade sincronizado
     cmd_inputs: list[str] = ["ffmpeg", "-y"]
@@ -358,7 +369,7 @@ def _render_montage_from_segments(
     print(f"  [OK] {mp4_out.name}  -> {mp4_out.stat().st_size / 1024:.1f} KB")
 
 
-def build_video_mvp() -> None:
+def build_video_mvp(images_only: bool = False) -> None:
     """
     Vídeo 01 (Seção 02 — Galeria): Montagem dinâmica acelerada de 5 modelos prontas
     (Raila, Faah Gomes, Cliente loira, Produção noturna e Morena sorrindo), mudo e sem texto.
@@ -388,10 +399,12 @@ def build_video_mvp() -> None:
         poster_out=OUT_MEDIA / "video-mvp-poster.webp",
         webm_out=OUT_MEDIA / "video-mvp-galeria.webm",
         mp4_out=OUT_MEDIA / "video-mvp-galeria.mp4",
+        poster_size=(480, 600),
+        images_only=images_only,
     )
 
 
-def build_video_about_broll() -> None:
+def build_video_about_broll(images_only: bool = False) -> None:
     """
     Vídeo 02 (Seção 04 — Sobre & Estúdio): Montagem dinâmica de bancada Chanel/Dior
     + acabamento de estúdio + Irondina finalizando cabelo em set iluminado.
@@ -416,6 +429,8 @@ def build_video_about_broll() -> None:
         poster_out=OUT_MEDIA / "video-sobre-poster.webp",
         webm_out=OUT_MEDIA / "video-sobre-bastidores.webm",
         mp4_out=OUT_MEDIA / "video-sobre-bastidores.mp4",
+        poster_size=(360, 450),
+        images_only=images_only,
     )
 
 
@@ -606,99 +621,104 @@ def build_og_image(tag_map: dict[str, Path]) -> None:
 
 
 def main() -> None:
+    images_only = "--images-only" in sys.argv
     print("=== Iniciando Pipeline de Mídias (lp-irondina) ===")
     tag_map = load_tag_map()
 
-    # 1. Hero (LCP estático real + responsividade + palco cinematográfico full-bleed)
+    # 1. Hero (LCP estático calibrado + responsivo mobile 750x938 para 412@1.75x & desktop 960x1200)
     print("\n1. Processando fotos da Hero (sec-01-hero)...")
     with Image.open(tag_map["IG-06"]) as img:
         save_webp(
             face_aware_crop(img, 960, 1200, "portrait"),
             OUT_MEDIA / "hero-ig-06.webp",
-            quality=85,
+            quality=76,
         )
         save_webp(
-            face_aware_crop(img, 720, 900, "hero_mobile"),
+            face_aware_crop(img, 750, 938, "hero_mobile"),
             OUT_MEDIA / "hero-ig-06-sm.webp",
-            quality=83,
+            quality=73,
         )
     with Image.open(tag_map["IG-09"]) as img:
         save_webp(
             face_aware_crop(img, 720, 900, "portrait"),
             OUT_MEDIA / "hero-ig-09.webp",
-            quality=84,
+            quality=78,
         )
     with Image.open(tag_map["IG-03"]) as img:
         save_webp(
-            face_aware_crop(img, 1200, 1500, "portrait"),
+            face_aware_crop(img, 960, 1200, "portrait"),
             OUT_MEDIA / "hero-stage-ig03.webp",
-            quality=86,
+            quality=78,
         )
         save_webp(
-            face_aware_crop(img, 720, 900, "hero_mobile"),
+            face_aware_crop(img, 750, 938, "hero_mobile"),
             OUT_MEDIA / "hero-stage-ig03-sm.webp",
-            quality=83,
+            quality=73,
         )
     with Image.open(tag_map["IG-01"]) as img:
         save_webp(
-            face_aware_crop(img, 1200, 1500, "portrait"),
+            face_aware_crop(img, 960, 1200, "portrait"),
             OUT_MEDIA / "hero-stage-ig01.webp",
-            quality=85,
+            quality=76,
         )
         save_webp(
-            face_aware_crop(img, 720, 900, "hero_mobile"),
+            face_aware_crop(img, 750, 938, "hero_mobile"),
             OUT_MEDIA / "hero-stage-ig01-sm.webp",
-            quality=83,
+            quality=73,
         )
 
-    # 2. Galeria & Serviços (Proporção padronizada 4:5 = 720x900 para evitar layout shift)
-    print("\n2. Processando fotos eleitas da Galeria e Serviços (padrão 4:5)...")
+    # 2. Galeria & Serviços (Lightbox 720x900 quality=78 + Card responsivo -sm.webp 400x500 / 420x560 quality=76)
+    print("\n2. Processando fotos eleitas da Galeria e Serviços (720x900 + variantes -sm)...")
     gallery_specs = [
-        # (Tag, output_name, width, height)
-        ("IG-09", "ig-09.webp", 720, 900),
-        ("IG-10", "ig-10.webp", 720, 900),
-        ("IG-11", "ig-11.webp", 720, 900),
-        ("IG-12", "ig-12.webp", 720, 900),
-        ("IG-16", "ig-16.webp", 720, 900),
-        ("IG-18", "ig-18.webp", 720, 900),
-        ("IG-19", "ig-19.webp", 720, 900),
-        ("IG-20", "ig-20.webp", 720, 900),
-        ("IG-24", "ig-24.webp", 720, 900),
-        ("IG-28", "ig-28.webp", 720, 900),
-        ("IG-49", "ig-49.webp", 720, 900),
-        ("IG-58", "ig-58.webp", 720, 900),
-        ("IG-59", "ig-59.webp", 720, 900),
-        ("IG-66", "ig-66.webp", 720, 900),
+        # (Tag, output_name, width, height, sm_w, sm_h)
+        ("IG-09", "ig-09.webp", 720, 900, 400, 500),
+        ("IG-10", "ig-10.webp", 720, 900, 400, 500),
+        ("IG-11", "ig-11.webp", 720, 900, 400, 500),
+        ("IG-12", "ig-12.webp", 720, 900, 400, 500),
+        ("IG-16", "ig-16.webp", 720, 900, 400, 500),
+        ("IG-18", "ig-18.webp", 720, 900, 400, 500),
+        ("IG-19", "ig-19.webp", 720, 900, 400, 500),
+        ("IG-20", "ig-20.webp", 720, 900, 400, 500),
+        ("IG-24", "ig-24.webp", 720, 900, 400, 500),
+        ("IG-28", "ig-28.webp", 720, 900, 400, 500),
+        ("IG-49", "ig-49.webp", 720, 900, 400, 500),
+        ("IG-58", "ig-58.webp", 720, 900, 400, 500),
+        ("IG-59", "ig-59.webp", 720, 900, 400, 500),
+        ("IG-66", "ig-66.webp", 720, 900, 400, 500),
         # Ensaios
-        ("IG-01", "ig-01.webp", 720, 900),
-        ("IG-03", "ig-03.webp", 720, 900),
-        ("IG-13", "ig-13.webp", 720, 900),
-        ("IG-15", "ig-15.webp", 720, 900),
-        ("IG-32", "ig-32.webp", 720, 900),
-        ("IG-33", "ig-33.webp", 720, 900),
-        ("IG-37", "ig-37.webp", 720, 900),
-        ("IG-38", "ig-38.webp", 720, 900),
-        ("IG-44", "ig-44.webp", 720, 900),
+        ("IG-01", "ig-01.webp", 720, 900, 400, 500),
+        ("IG-03", "ig-03.webp", 720, 900, 400, 500),
+        ("IG-13", "ig-13.webp", 720, 900, 400, 500),
+        ("IG-15", "ig-15.webp", 720, 900, 400, 500),
+        ("IG-32", "ig-32.webp", 720, 900, 400, 500),
+        ("IG-33", "ig-33.webp", 720, 900, 400, 500),
+        ("IG-37", "ig-37.webp", 720, 900, 400, 500),
+        ("IG-38", "ig-38.webp", 720, 900, 400, 500),
+        ("IG-44", "ig-44.webp", 720, 900, 400, 500),
         # Noivas & Civil
-        ("IG-30", "ig-30.webp", 720, 900),
-        ("IG-31", "ig-31.webp", 720, 900),
-        # Antes & Depois
-        ("IG-04", "ig-04-antes.webp", 720, 900),
-        ("IG-05", "ig-05-depois-olhos.webp", 720, 900),
-        ("IG-06", "ig-06-depois.webp", 720, 900),
+        ("IG-30", "ig-30.webp", 720, 900, 400, 500),
+        ("IG-31", "ig-31.webp", 720, 900, 400, 500),
+        # Antes & Depois (Cards 3:4 420x560 em sm + 720x900 no lightbox)
+        ("IG-04", "ig-04-antes.webp", 720, 900, 420, 560),
+        ("IG-05", "ig-05-depois-olhos.webp", 720, 900, 420, 560),
+        ("IG-06", "ig-06-depois.webp", 720, 900, 420, 560),
         # Sobre (Sec 04)
-        ("IRO-04", "iro-04.webp", 750, 1000),
-        ("IRO-06", "iro-06.webp", 720, 900),
-        ("IRO-03", "iro-03.webp", 750, 1000),
-        ("IRO-01", "iro-01.webp", 750, 1000),
+        ("IRO-04", "iro-04.webp", 750, 1000, 0, 0),
+        ("IRO-06", "iro-06.webp", 720, 900, 0, 0),
+        ("IRO-03", "iro-03.webp", 750, 1000, 0, 0),
+        ("IRO-01", "iro-01.webp", 750, 1000, 0, 0),
         # Cursos (Sec 06)
-        ("IG-41", "ig-41-curso.webp", 720, 900),
+        ("IG-41", "ig-41-curso.webp", 720, 900, 0, 0),
     ]
 
-    for tag, out_name, w, h in gallery_specs:
+    for tag, out_name, w, h, sm_w, sm_h in gallery_specs:
         with Image.open(tag_map[tag]) as img:
             cropped = face_aware_crop(img, w, h, mode="portrait")
-            save_webp(cropped, OUT_MEDIA / out_name, quality=83)
+            save_webp(cropped, OUT_MEDIA / out_name, quality=78)
+            if sm_w > 0 and sm_h > 0:
+                sm_path = OUT_MEDIA / f"{Path(out_name).stem}-sm.webp"
+                sm_cropped = face_aware_crop(img, sm_w, sm_h, mode="portrait")
+                save_webp(sm_cropped, sm_path, quality=76)
 
     # 3. Mini-Avatares 128x128 (Sec 05)
     print("\n3. Processando 5 Mini-Avatares Reais (128x128 WebP)...")
@@ -712,7 +732,7 @@ def main() -> None:
     for tag, out_name in avatars:
         with Image.open(tag_map[tag]) as img:
             av = face_aware_crop(img, 128, 128, mode="avatar")
-            save_webp(av, OUT_MEDIA / out_name, quality=85)
+            save_webp(av, OUT_MEDIA / out_name, quality=80)
 
     # 4. Imagens Provisórias na Proporção Ideal (para slots TROCAR)
     print("\n4. Processando imagens provisórias para slots com tag central TROCAR...")
@@ -726,11 +746,27 @@ def main() -> None:
         mode="portrait",
     )
     create_styled_placeholder(
+        brain_dir / "raw_placeholder_penteado_costas_1795255667779.jpg",
+        tag_map["IG-59"],
+        OUT_MEDIA / "placeholder-penteado-costas-sm.webp",
+        400,
+        500,
+        mode="portrait",
+    )
+    create_styled_placeholder(
         brain_dir / "raw_placeholder_noiva_cartorio_1795255682018.jpg",
         tag_map["IG-31"],
         OUT_MEDIA / "placeholder-noiva-cartorio.webp",
         720,
         900,
+        mode="portrait",
+    )
+    create_styled_placeholder(
+        brain_dir / "raw_placeholder_noiva_cartorio_1795255682018.jpg",
+        tag_map["IG-31"],
+        OUT_MEDIA / "placeholder-noiva-cartorio-sm.webp",
+        400,
+        500,
         mode="portrait",
     )
     create_styled_placeholder(
@@ -750,13 +786,13 @@ def main() -> None:
         mode="avatar",
     )
 
-    # 5. Vídeos Editoriais Mudos (Showreel de Modelos + Bastidores & Bancada)
-    print("\n5. Gerando Montagens Editoriais Mudas (Showreel Modelos + Bastidores)...")
-    build_video_mvp()
-    build_video_about_broll()
+    # 5. Posters Reduzidos + Vídeos Editoriais Mudos (pula re-encode se --images-only)
+    print("\n5. Processando Posters otimizados e Vídeos Editoriais Mudas...")
+    build_video_mvp(images_only=images_only)
+    build_video_about_broll(images_only=images_only)
 
-    # 6. Open Graph 1200x630
-    print("\n6. Gerando Open Graph Image (1200x630)...")
+    # 6. Open Graph 1200x630 & 800x800
+    print("\n6. Gerando Open Graph Image (1200x630 + 800x800)...")
     build_og_image(tag_map)
 
     print("\n=== Pipeline de Mídias Concluído com Sucesso! ===")

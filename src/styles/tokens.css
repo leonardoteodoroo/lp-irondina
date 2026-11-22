@@ -1,12 +1,70 @@
-/* Tipografia Oficial Self-Hosted WOFF2 (SIL OFL) — EB Garamond + DM Sans */
-@import "@fontsource/eb-garamond/400.css";
-@import "@fontsource/eb-garamond/500.css";
-@import "@fontsource/eb-garamond/600.css";
-@import "@fontsource/eb-garamond/400-italic.css";
-@import "@fontsource/eb-garamond/500-italic.css";
-@import "@fontsource/dm-sans/400.css";
-@import "@fontsource/dm-sans/500.css";
-@import "@fontsource/dm-sans/600.css";
+/* Tipografia Oficial Self-Hosted WOFF2 exclusiva subset latin (zero cyrillic/greek/vietnamese/woff legado) */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/eb-garamond/files/eb-garamond-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/eb-garamond/files/eb-garamond-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/dm-sans/files/dm-sans-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('@fontsource/dm-sans/files/dm-sans-latin-600-normal.woff2') format('woff2');
+}
+
+/* Fallbacks calibrados metricamente (size-adjust + overrides) para CLS ~ 0,000 no font swap */
+@font-face {
+  font-family: 'EB Garamond Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 94%;
+  ascent-override: 103%;
+  descent-override: 31%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial'), local('Helvetica Neue'), local('Roboto');
+  size-adjust: 101%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
 
 @import "tailwindcss";
 
@@ -117,9 +175,9 @@
   --border-focus: var(--color-espresso-700);
   --border-on-dark: rgba(212, 197, 183, 0.18);
 
-  /* Famílias Tipográficas (EB Garamond + DM Sans) */
-  --font-display: 'EB Garamond', Georgia, serif;
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  /* Famílias Tipográficas (EB Garamond + DM Sans com Fallback Calibrado) */
+  --font-display: 'EB Garamond', 'EB Garamond Fallback', Georgia, serif;
+  --font-sans: 'DM Sans', 'DM Sans Fallback', system-ui, -apple-system, sans-serif;
 
   /* Escala Fluida Resiliente a Fonte do SO */
   --text-display-hero: clamp(2.35rem, 4.6vw + 0.5rem, 4.35rem);
@@ -306,18 +364,47 @@ details.editorial-faq > summary::-webkit-details-marker {
   display: none;
 }
 
-/* Shimmer discreto para estímulo tátil nas tags do carrossel */
-@keyframes tagPulseRing {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(109, 63, 40, 0.22);
+/* Entrada Hero ultraleve em GPU-only (substitui motion/react na primeira dobra) */
+@keyframes heroEnterFadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
   }
-  50% {
-    box-shadow: 0 0 0 4px rgba(109, 63, 40, 0.08);
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-hero-enter {
+  animation: heroEnterFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Anel tátil 100% GPU (transform + opacity via ::after, substituindo box-shadow) */
+@keyframes tagPulseGpu {
+  0% {
+    transform: scale3d(1, 1, 1);
+    opacity: 0.55;
+  }
+  70%, 100% {
+    transform: scale3d(1.03, 1.14, 1);
+    opacity: 0;
   }
 }
 
 .animate-tag-hint {
-  animation: tagPulseRing 2.6s ease-in-out infinite;
+  position: relative;
+}
+
+.animate-tag-hint::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 1.5px solid rgba(109, 63, 40, 0.38);
+  pointer-events: none;
+  animation: tagPulseGpu 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
